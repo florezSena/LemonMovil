@@ -3,6 +3,7 @@ import 'package:lemonapp/delegates/search_producto.dart';
 import 'package:lemonapp/models/producto.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:lemonapp/pages/products/add_product.dart';
 void main() {
   runApp(const MyApp());
 }
@@ -13,12 +14,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Flutter Demo wtf',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: primaryColor),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'LEMON DEMO'),
+      home: const MyHomePage(title: 'LEMON DEMO by FLOREZ'),
     );
   }
 }
@@ -33,7 +34,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   late Future<List<Producto>> _listaProductos;
   Future<List<Producto>>  _getProductos() async {
-    final Uri url = Uri.parse("https://47ff-2801-1ca-1-111-71b8-1625-d83a-c66f.ngrok-free.app/api/Productos/GetProduct");
+    final Uri url = Uri.parse("http://florezsena-001-site1.ltempurl.com/api/Productos/GetProduct");
     final response = await http.get(
       url,
       headers: {
@@ -80,7 +81,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFF077336),
+        backgroundColor:primaryColor,
         title: Text(widget.title,style:const TextStyle(color: Colors.white),),
         centerTitle: true,
         actions: [
@@ -130,7 +131,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
+                    return const Center(
+                    child: CircularProgressIndicator(),
+                  );
                   } else if (snapshot.hasError) {
                     return Text('Error: ${snapshot.error}');
                   } else {
@@ -155,7 +158,15 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           ),
         ),
-      )
+      ),
+      floatingActionButton: FloatingActionButton(onPressed: (){
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const AddProduct()),
+        );
+      },
+      child: const Icon(Icons.add),
+      ),
     );
   }
 }

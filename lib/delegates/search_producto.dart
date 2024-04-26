@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 
 class SearchProducto extends SearchDelegate<Producto?>{
   Future<List<Producto>>  _getProductos(String nombreSearch) async {
-    final Uri url = Uri.parse("https://47ff-2801-1ca-1-111-71b8-1625-d83a-c66f.ngrok-free.app/api/Productos/GetProductByName?nombre="+nombreSearch);
+    final Uri url = Uri.parse("http://florezsena-001-site1.ltempurl.com/api/Productos/GetProductByName?nombre="+nombreSearch);
     final response = await http.get(
       url,
       headers: {
