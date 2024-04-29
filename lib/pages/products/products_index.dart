@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:lemonapp/delegates/search_producto.dart';
 import 'package:lemonapp/models/producto.dart';
 import 'package:http/http.dart' as http;
@@ -19,6 +20,7 @@ class PrdouctosIndex extends StatefulWidget {
 class _PrdouctosIndexState extends State<PrdouctosIndex> {
   late Future<List<Producto>> _listaProductos;
   bool _isRefreshing = false;
+  bool _isAlertaCambiarEstado=false;
   Future<List<Producto>>  _getProductos() async {
     final Uri url = Uri.parse("http://florezsena-001-site1.ltempurl.com/api/Productos/GetProduct");
     final response = await http.get(
@@ -86,12 +88,20 @@ class _PrdouctosIndexState extends State<PrdouctosIndex> {
             child: Column(
               children: [
                 Container(
-                  margin:const EdgeInsets.only(top: 20.0), // Margen superior de 20.0
-                  child:const Text(
-                    "Gestión de productos",
-                    style: TextStyle(
-                      fontSize: 24.0,
-                    ),
+                  margin:const EdgeInsets.only(top: 20.0),
+                  child:const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.shopping_basket),
+                      Padding(padding: EdgeInsets.only(left: 5)),
+                      Text(
+                        "Gestión de Productos",
+                        style: TextStyle(
+                          fontSize: 24.0,
+                          
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 GestureDetector(
@@ -102,7 +112,8 @@ class _PrdouctosIndexState extends State<PrdouctosIndex> {
                       }
                     });
                   },
-                  child: Container( // Un Container para mayor flexibilidad de diseño
+                  child: Container(
+                  
                     margin:const EdgeInsets.only(top: 20.0,bottom: 5.0),
                     decoration: BoxDecoration( // Para el borde redondeado
                       borderRadius: BorderRadius.circular(5.0), 
@@ -151,18 +162,31 @@ class _PrdouctosIndexState extends State<PrdouctosIndex> {
         
                             child: ExpansionTile(
                               trailing: Switch(
+                                
+                                inactiveTrackColor: Colors.white,
+                                inactiveThumbColor: Colors.grey.shade600,
                                 value: switchEstado,
                                 onChanged: (value) => setState(() {
+                                  
                                   _alertaCambiarEstado(context,producto).then((value) {
                                     if(value){
-                                      ScaffoldMessenger.of(context)
-                                      .showSnackBar(
-                                        const SnackBar(
-                                          content: Text('Estado cambiado exitosamente',style: TextStyle(color:Colors.white),),
-                                          duration: Duration(seconds: 3),
-                                          backgroundColor: primaryColor,
-                                        ),
-                                      );
+                                      if(_isAlertaCambiarEstado==false){
+                                        setState(() {
+                                          _isAlertaCambiarEstado=true;
+                                        });
+                                        ScaffoldMessenger.of(context)
+                                        .showSnackBar(
+                                          const SnackBar(
+                                            content: Text('Estado cambiado exitosamente',style: TextStyle(color:Colors.white),),
+                                            duration: Duration(seconds: 3),
+                                            backgroundColor: primaryColor,
+                                          ),
+                                        ).closed.then((value) {
+                                          setState(() {
+                                            _isAlertaCambiarEstado=false;
+                                          });
+                                        });
+                                      }
                                       setState(() {
                                         switchEstado = !switchEstado;
                                       });
@@ -194,56 +218,75 @@ class _PrdouctosIndexState extends State<PrdouctosIndex> {
                                 
                                 ListTile(
                                   contentPadding:const EdgeInsets.all(0),
-                                  subtitle: Text('#Producto: ${producto.idProducto}\nCantidad: ${producto.cantidad}\nCosto: ${producto.precio}\nDescripcion: ${producto.descripcion}\nEstado: $stringEstado'),
+                                  subtitle: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                                    children: [
+                                      
+                                      Text('#Producto: ${producto.idProducto}\nCantidad: ${producto.cantidad}\nCosto: ${producto.precio}\nDescripcion: ${producto.descripcion!.length > 30 ? producto.descripcion!.substring(0, 25) + '\n' + producto.descripcion!.substring(25) : producto.descripcion}\nEstado: $stringEstado'),
+                                      Padding(
+                                        padding: const EdgeInsets.only(right: 9),
+                                        child: Column(
+                                          
+                                          children: [
+                                            GestureDetector(
+                                              onTap: () {
+                                                
+                                              },
+                                              child: Container(
+                                                padding: EdgeInsets.all(5),
+                                                decoration: BoxDecoration(
+                                                  color:producto.estado==1?primaryColor:Colors.white,
+                                                  borderRadius: BorderRadius.circular(5),
+                                                  border:producto.estado==1?Border.all(color:Colors.transparent,width: 2): Border.all(color:Colors.grey.shade600,width: 2)
+                                                ),
+                                                child: Icon(Icons.edit, color: producto.estado==1?Colors.white:Colors.grey.shade600,size: 30, ))
+                                            ),
+                                            Padding(padding: EdgeInsets.only(bottom: 17)),
+                                            GestureDetector(
+                                              onTap: ()async {
+                                                await _alertaEliminarProducto(context, producto).then((value){
+                                                  if(value){
+                                                    ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                      const SnackBar(
+                                                        content: Text('Producto eliminado exitosamente',style: TextStyle(color:Colors.white),),
+                                                        duration: Duration(seconds: 3),
+                                                        backgroundColor: primaryColor,
+                                                      ),
+                                                    );
+                                                    setState(() {
+                                                      productos.removeAt(index);
+                                                    });
+                                                  }else{
+                                                    ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                      const SnackBar(
+                                                        content: Text('Un producto asociado no puede ser eliminado',style: TextStyle(color:Colors.white),),
+                                                        duration: Duration(seconds: 3),
+                                                        backgroundColor: Colors.black,
+                                                      ),
+                                                    );
+                                                  }
+                                                });
+                                              },
+                                              child: Container(
+                                                padding: EdgeInsets.all(5),
+                                                decoration: BoxDecoration(
+                                                  color:producto.estado==1?primaryColor:Colors.white,
+                                                  borderRadius: BorderRadius.circular(5),
+                                                  border:producto.estado==1?Border.all(color:Colors.transparent,width: 2): Border.all(color:Colors.grey.shade600,width: 2)
+                                                ),
+                                                child: Icon(Icons.delete, color: producto.estado==1?Colors.white:Colors.grey.shade600,size: 30,))
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    ],
+                                  ),
                                 ),
                                 
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    ElevatedButton(
-                                      onPressed: (){},
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.black,
-                                        shadowColor: Colors.transparent,
-                                      ),
-                                      child:const Icon(Icons.edit,color: Colors.white,size: 30,)
-                                    ),
-                                    ElevatedButton(
-                                      onPressed: ()async {
-                                        await _alertaEliminarProducto(context, producto).then((value){
-                                          if(value){
-                                            ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                              const SnackBar(
-                                                content: Text('Producto eliminado exitosamente',style: TextStyle(color:Colors.white),),
-                                                duration: Duration(seconds: 3),
-                                                backgroundColor: primaryColor,
-                                              ),
-                                            );
-                                            setState(() {
-                                              productos.removeAt(index);
-                                            });
-                                          }else{
-                                            ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                              const SnackBar(
-                                                content: Text('Un producto asociado no puede ser eliminado',style: TextStyle(color:Colors.white),),
-                                                duration: Duration(seconds: 3),
-                                                backgroundColor: Colors.black,
-                                              ),
-                                            );
-                                          }
-                                        });
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.black,
-                                        shadowColor: Colors.transparent, 
-                                        // minimumSize: Size(12,12)
-                                      ),
-                                      child:const Icon(Icons.delete,color: Colors.white,size: 30,)
-                                    ),
-                                  ],
-                                )
+                                
                               ],
                             ),
                           );
@@ -298,14 +341,20 @@ Future <bool> _alertaCambiarEstado(BuildContext context,Producto productoACambia
         title: const Text('¿Estas seguro de cambiar el estado?'),
         actions: [
           TextButton(
-            style:const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.black)),
+            style:const ButtonStyle(
+              shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5)))),
+              backgroundColor: MaterialStatePropertyAll(Colors.black)
+            ),
             child: const Text('Cancelar',style: TextStyle(color: Colors.white),),
             onPressed: () {
               Navigator.pop(context);
             },
           ),
           TextButton(
-            style:const ButtonStyle(backgroundColor: MaterialStatePropertyAll(primaryColor)),
+            style:const ButtonStyle(
+              shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5)))),
+              backgroundColor: MaterialStatePropertyAll(primaryColor)
+            ),
             child: const Text('Aceptar',style: TextStyle(color: Colors.white),),
             onPressed: () async{
               Navigator.pop(context);
@@ -351,13 +400,21 @@ Future<bool> _alertaEliminarProducto(BuildContext context,Producto productoAElim
         title: const Text('¿Estas seguro de eliminar el producto?'),
         actions: [
           TextButton(
-            child: const Text('Cancelar'),
+            style:const ButtonStyle(
+              shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5)))),
+              backgroundColor: MaterialStatePropertyAll(Colors.black)
+            ),
+            child: const Text('Cancelar', style: TextStyle(color: Colors.white),),
             onPressed: () {
               Navigator.pop(context);
             },
           ),
           TextButton(
-            child: const Text('Aceptar'),
+            style:const ButtonStyle(
+              shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5)))),
+              backgroundColor: MaterialStatePropertyAll(primaryColor)
+            ),
+            child: const Text('Aceptar', style: TextStyle(color: Colors.white),),
             onPressed: () async{
               Navigator.pop(context);
               await _eliminarProducto(productoAEliminar).then((response){

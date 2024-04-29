@@ -107,11 +107,10 @@ class _AddProduct extends State<AddProduct> {
               children: [
                 Container(
                   margin:const EdgeInsets.only(top: 20.0,bottom: 40.0), // Margen superior de 20.0
-                  child:const Text(
+                  child: Text(
                     "Registrar producto",
                     style: TextStyle(
                       fontSize: 24.0, // Tamaño de la fuente de 24.0
-                      fontWeight: FontWeight.bold, // Negrita
                     ),
                   ),
                 ),
@@ -131,7 +130,7 @@ class _AddProduct extends State<AddProduct> {
                           color: Colors.grey,
                         ),
                       ),
-                      focusedBorder: OutlineInputBorder(
+                        focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10.0),
                         borderSide: const BorderSide(
                           color: primaryColor,
@@ -154,8 +153,24 @@ class _AddProduct extends State<AddProduct> {
                 ),
                 TextFormField(
                   controller: descripcionController,
-                  decoration:const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: 'Descripcion',
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 10.0),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: const BorderSide(
+                          color: Colors.grey,
+                        ),
+                      ),
+                        focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: const BorderSide(
+                          color: primaryColor,
+                        ),
+                      ),
                   ),
                   validator:(value){
                     RegExp regexDescripcion = RegExp(r'^(?:[^\s]+(?:\s[^\s]+)*)?$');
@@ -232,7 +247,12 @@ class _AddProduct extends State<AddProduct> {
                         });
                       }
                     },
-                    style: ElevatedButton.styleFrom(backgroundColor: primaryColor),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primaryColor,
+                      shape:const RoundedRectangleBorder( // Configura los bordes
+                      borderRadius: BorderRadius.all(Radius.circular(5)), 
+                    ),
+                    ),
                     child:const Text('Guardar',style: TextStyle(color: Colors.white),)
                   ),
                 ),
@@ -246,7 +266,7 @@ class _AddProduct extends State<AddProduct> {
                     backgroundColor: Colors.black,
                     padding: const EdgeInsets.symmetric(vertical: 10.0), // Ajusta la altura
                     shape:const RoundedRectangleBorder( // Configura los bordes
-                      borderRadius: BorderRadius.all(Radius.circular(5)), // Bordes rectos
+                      borderRadius: BorderRadius.all(Radius.circular(5)), 
                     ),
                   ),
                   child:const Text('Cancelar',style: TextStyle(color: Colors.white)),
