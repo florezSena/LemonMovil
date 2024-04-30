@@ -105,13 +105,21 @@ class _AddProduct extends State<AddProduct> {
             
             child: Column(
               children: [
+                
                 Container(
                   margin:const EdgeInsets.only(top: 20.0,bottom: 40.0), // Margen superior de 20.0
-                  child: Text(
-                    "Registrar producto",
-                    style: TextStyle(
-                      fontSize: 24.0, // Tamaño de la fuente de 24.0
-                    ),
+                  child:const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.shopping_basket),
+                      Padding(padding: EdgeInsets.only(left: 5)),
+                      Text(
+                        "Registrar Producto",
+                        style: TextStyle(
+                          fontSize: 24.0, // Tamaño de la fuente de 24.0
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 Container(

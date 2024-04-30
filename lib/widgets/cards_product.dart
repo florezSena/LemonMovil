@@ -8,212 +8,208 @@ import 'package:lemonapp/pages/layout/layout_componentes.dart';
 import 'package:lemonapp/services/service_product.dart';
 
 class ProductCards extends StatefulWidget {
-  const ProductCards({super.key});
+  Future <List<Producto>> productos;
+
+  ProductCards({super.key,required this.productos});
   @override
   State<ProductCards> createState() => _ProductCardsState();
 }
 
 class _ProductCardsState extends State<ProductCards> {
   bool _isAlertaCambiarEstado=false;
-  bool _isRefreshing=false;
-  late Future <List<Producto>> _listaProductos;
-  @override
-  void initState() {
-    super.initState();
-    _listaProductos= getProductos();
-  }
-  Future<void> _refresh() async {
-    setState(() {
-      _isRefreshing=true;
-    });
-    _listaProductos= getProductos();
-    setState(() {
-      _isRefreshing=false;
-    });
-  }
+  
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
-      onRefresh: _refresh, 
-      child: Column(
-        children: [
-          Expanded(
-            child: FutureBuilder<List<Producto>>(
-            future: _listaProductos,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting || _isRefreshing==true) {
-                return const Center(
-                child: CircularProgressIndicator(),
-              );
-              } else if (snapshot.hasError) {
-                return SingleChildScrollView(
-                  child: Container(
+    Future<List<Producto>>listaProductos=Future.value(widget.productos);
+    return Center(
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width * 0.9,
+        child: Column(
+          children: [
+            Expanded(
+              child: FutureBuilder<List<Producto>>(
+              future: listaProductos,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                  child: CircularProgressIndicator(),
+                );
+                } else if (snapshot.hasError) {
+                  return Container(
                     alignment: Alignment.center,
                     height: MediaQuery.of(context).size.height,
                     width: MediaQuery.of(context).size.width,
-                    child:const Text("Error de conexion"),
-                  ),
-                );
-              }else {
-                List<Producto> productos = snapshot.data!;
-                return ListView.builder(
-                  itemCount: productos.length,
-                  itemBuilder: (context, index) {
-                    Producto producto = productos[index];
-                    bool switchEstado= producto.estado==1 ? true : false;
-                    String stringEstado=producto.estado==1 ? "Activo" : "Inactivo";
-                    return Container(
-                      margin: index == productos.length - 1 
-                      ? const EdgeInsets.only(bottom: 130.0,top:20)
-                      : const EdgeInsets.only(top: 20),
-                      padding:const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.grey,
-                          width: 0.5, 
-                        ),
-                        
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-            
-                      child: ExpansionTile(
-                        trailing: Switch(
+                    child:const Text("Ingrese el nombre del producto a buscar"),
+                  );
+                }else if(snapshot.data!.isEmpty){
+                  return Container(
+                    alignment: Alignment.center,
+                    height: MediaQuery.of(context).size.height,
+                    width: MediaQuery.of(context).size.width,
+                    child:const Text("Producto no encontrado"),
+                  );
+                }else {
+                  List<Producto> productos = snapshot.data!;
+                  return ListView.builder(
+                    itemCount: productos.length,
+                    itemBuilder: (context, index) {
+                      Producto producto = productos[index];
+                      bool switchEstado= producto.estado==1 ? true : false;
+                      String stringEstado=producto.estado==1 ? "Activo" : "Inactivo";
+                      return Container(
+                        margin: index == productos.length - 1 
+                        ? const EdgeInsets.only(bottom: 130.0,top:20)
+                        : const EdgeInsets.only(top: 20),
+                        padding:const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.grey,
+                            width: 0.5, 
+                          ),
                           
-                          inactiveTrackColor: Colors.white,
-                          inactiveThumbColor: Colors.grey.shade600,
-                          value: switchEstado,
-                          onChanged: (value) => setState(() {
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+              
+                        child: ExpansionTile(
+                          trailing: Switch(
                             
-                            _alertaCambiarEstado(context,producto).then((value) {
-                              if(value){
-                                if(_isAlertaCambiarEstado==false){
+                            inactiveTrackColor: Colors.white,
+                            inactiveThumbColor: Colors.grey.shade600,
+                            value: switchEstado,
+                            onChanged: (value) async {
+                              
+                              await _alertaCambiarEstado(context,producto).then((value) {
+                                if(value){
+                                  if(_isAlertaCambiarEstado==false){
+                                    setState(() {
+                                      _isAlertaCambiarEstado=true;
+                                    });
+                                    ScaffoldMessenger.of(context)
+                                    .showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Estado cambiado exitosamente',style: TextStyle(color:Colors.white),),
+                                        duration: Duration(seconds: 3),
+                                        backgroundColor: primaryColor,
+                                      ),
+                                    ).closed.then((value) {
+                                      setState(() {
+                                        _isAlertaCambiarEstado=false;
+                                      });
+                                    });
+                                  }
                                   setState(() {
-                                    _isAlertaCambiarEstado=true;
+                                    switchEstado = !switchEstado;
                                   });
+                                }else{
                                   ScaffoldMessenger.of(context)
                                   .showSnackBar(
                                     const SnackBar(
-                                      content: Text('Estado cambiado exitosamente',style: TextStyle(color:Colors.white),),
+                                      content: Text('Error al cambiar el estado',style: TextStyle(color:Colors.white),),
                                       duration: Duration(seconds: 3),
-                                      backgroundColor: primaryColor,
+                                      backgroundColor: Colors.black,
                                     ),
-                                  ).closed.then((value) {
-                                    setState(() {
-                                      _isAlertaCambiarEstado=false;
-                                    });
-                                  });
+                                  );
                                 }
-                                setState(() {
-                                  switchEstado = !switchEstado;
-                                });
-                              }else{
-                                ScaffoldMessenger.of(context)
-                                .showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Error al cambiar el estado',style: TextStyle(color:Colors.white),),
-                                    duration: Duration(seconds: 3),
-                                    backgroundColor: Colors.black,
-                                  ),
-                                );
-                              }
-                            },);
-                          }),
-                        ),
-                        backgroundColor: Colors.transparent,
-                        tilePadding: const EdgeInsets.only(left: 0),
-                        title: Text(producto.nombre),
-                        subtitle: producto.cantidad<1?const Text("Producto con poco stock",style: TextStyle(color: Colors.grey),):null,
-                        shape: RoundedRectangleBorder( 
-                          side:const BorderSide( 
-                            color: Colors.transparent, 
-                            width: 0,
+                              },);
+                            },
                           ),
-                          borderRadius: BorderRadius.circular(5.0), // Redondeo de las esquinas
-                        ),
-                        children: [
-                          
-                          ListTile(
-                            contentPadding:const EdgeInsets.all(0),
-                            subtitle: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          
-                              children: [
-                                
-                                Text('#Producto: ${producto.idProducto}\nCantidad: ${producto.cantidad}\nCosto: ${producto.precio}\nDescripcion: ${producto.descripcion!.length > 30 ? producto.descripcion!.substring(0, 25) + '\n' + producto.descripcion!.substring(25) : producto.descripcion}\nEstado: $stringEstado'),
-                                Padding(
-                                  padding: const EdgeInsets.only(right: 9),
-                                  child: Column(
-                                    
-                                    children: [
-                                      GestureDetector(
-                                        onTap: () {
-                                          
-                                        },
-                                        child: Container(
-                                          padding: EdgeInsets.all(5),
-                                          decoration: BoxDecoration(
-                                            color:producto.estado==1?primaryColor:Colors.white,
-                                            borderRadius: BorderRadius.circular(5),
-                                            border:producto.estado==1?Border.all(color:Colors.transparent,width: 2): Border.all(color:Colors.grey.shade600,width: 2)
-                                          ),
-                                          child: Icon(Icons.edit, color: producto.estado==1?Colors.white:Colors.grey.shade600,size: 30, ))
-                                      ),
-                                      Padding(padding: EdgeInsets.only(bottom: 17)),
-                                      GestureDetector(
-                                        onTap: ()async {
-                                          await _alertaEliminarProducto(context, producto).then((value){
-                                            if(value){
-                                              ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                                const SnackBar(
-                                                  content: Text('Producto eliminado exitosamente',style: TextStyle(color:Colors.white),),
-                                                  duration: Duration(seconds: 3),
-                                                  backgroundColor: primaryColor,
-                                                ),
-                                              );
-                                              setState(() {
-                                                productos.removeAt(index);
-                                              });
-                                            }else{
-                                              ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                                const SnackBar(
-                                                  content: Text('Un producto asociado no puede ser eliminado',style: TextStyle(color:Colors.white),),
-                                                  duration: Duration(seconds: 3),
-                                                  backgroundColor: Colors.black,
-                                                ),
-                                              );
-                                            }
-                                          });
-                                        },
-                                        child: Container(
-                                          padding: EdgeInsets.all(5),
-                                          decoration: BoxDecoration(
-                                            color:producto.estado==1?primaryColor:Colors.white,
-                                            borderRadius: BorderRadius.circular(5),
-                                            border:producto.estado==1?Border.all(color:Colors.transparent,width: 2): Border.all(color:Colors.grey.shade600,width: 2)
-                                          ),
-                                          child: Icon(Icons.delete, color: producto.estado==1?Colors.white:Colors.grey.shade600,size: 30,))
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              ],
+                          backgroundColor: Colors.transparent,
+                          tilePadding: const EdgeInsets.only(left: 0),
+                          title: Text(producto.nombre),
+                          subtitle: producto.cantidad<1?const Text("Producto con poco stock",style: TextStyle(color: Colors.grey),):null,
+                          shape: RoundedRectangleBorder( 
+                            side:const BorderSide( 
+                              color: Colors.transparent, 
+                              width: 0,
                             ),
+                            borderRadius: BorderRadius.circular(5.0), // Redondeo de las esquinas
                           ),
-                          
-                          
-                        ],
-                      ),
-                    );
-                  },
-                );
-              }
-            },
-          ),
-          ),
-        ],
-      ));
+                          children: [
+                            
+                            ListTile(
+                              contentPadding:const EdgeInsets.all(0),
+                              subtitle: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            
+                                children: [
+                                  
+                                  Text('#Producto: ${producto.idProducto}\nCantidad: ${producto.cantidad}\nCosto: ${producto.precio}\nEstado: $stringEstado'),
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 9),
+                                    child: Column(
+                                      
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () {
+                                            
+                                          },
+                                          child: Container(
+                                            padding: EdgeInsets.all(5),
+                                            decoration: BoxDecoration(
+                                              color:producto.estado==1?primaryColor:Colors.white,
+                                              borderRadius: BorderRadius.circular(5),
+                                              border:producto.estado==1?Border.all(color:Colors.transparent,width: 2): Border.all(color:Colors.grey.shade600,width: 2)
+                                            ),
+                                            child: Icon(Icons.edit, color: producto.estado==1?Colors.white:Colors.grey.shade600,size: 30, ))
+                                        ),
+                                        Padding(padding: EdgeInsets.only(bottom: 17)),
+                                        GestureDetector(
+                                          onTap: ()async {
+                                            await _alertaEliminarProducto(context, producto).then((value){
+                                              if(value){
+                                                ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                                  const SnackBar(
+                                                    content: Text('Producto eliminado exitosamente',style: TextStyle(color:Colors.white),),
+                                                    duration: Duration(seconds: 3),
+                                                    backgroundColor: primaryColor,
+                                                  ),
+                                                );
+                                                setState(() {
+                                                  productos.removeAt(index);
+                                                });
+                                              }else{
+                                                ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                                  const SnackBar(
+                                                    content: Text('Un producto asociado no puede ser eliminado',style: TextStyle(color:Colors.white),),
+                                                    duration: Duration(seconds: 3),
+                                                    backgroundColor: Colors.black,
+                                                  ),
+                                                );
+                                              }
+                                            });
+                                          },
+                                          child: Container(
+                                            padding: EdgeInsets.all(5),
+                                            decoration: BoxDecoration(
+                                              color:producto.estado==1?primaryColor:Colors.white,
+                                              borderRadius: BorderRadius.circular(5),
+                                              border:producto.estado==1?Border.all(color:Colors.transparent,width: 2): Border.all(color:Colors.grey.shade600,width: 2)
+                                            ),
+                                            child: Icon(Icons.delete, color: producto.estado==1?Colors.white:Colors.grey.shade600,size: 30,))
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                            
+                            
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                }
+              },
+            ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

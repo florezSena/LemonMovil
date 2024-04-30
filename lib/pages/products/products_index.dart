@@ -243,7 +243,8 @@ class _PrdouctosIndexState extends State<PrdouctosIndex> {
                                                   borderRadius: BorderRadius.circular(5),
                                                   border:producto.estado==1?Border.all(color:Colors.transparent,width: 2): Border.all(color:Colors.grey.shade600,width: 2)
                                                 ),
-                                                child: Icon(Icons.delete, color: producto.estado==1?Colors.white:Colors.grey.shade600,size: 30,))
+                                                child: Icon(Icons.delete, color: producto.estado==1?Colors.white:Colors.grey.shade600,size: 30,)
+                                                )
                                               ),
                                             ],
                                           ),
