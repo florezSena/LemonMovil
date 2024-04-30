@@ -1,13 +1,10 @@
 import 'dart:async';
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:lemonapp/delegates/search_producto.dart';
 import 'package:lemonapp/models/producto.dart';
-import 'package:http/http.dart' as http;
 import 'package:lemonapp/pages/layout/layout_componentes.dart';
 import 'package:lemonapp/pages/products/add_product.dart';
+import 'package:lemonapp/services/service_product.dart';
 
 
 class PrdouctosIndex extends StatefulWidget {
@@ -21,73 +18,19 @@ class _PrdouctosIndexState extends State<PrdouctosIndex> {
   late Future<List<Producto>> _listaProductos;
   bool _isRefreshing = false;
   bool _isAlertaCambiarEstado=false;
-  bool _errorConexion=false;
-  Future<List<Producto>>  _getProductos() async {
-    List<Producto> productos=[];
-
-    final Uri url = Uri.parse("http://florezsena-001-site1.ltempurl.com/api/Productos/GetProduct");
-    try{
-      final response = await http.get(
-        url,
-        headers: {
-          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJiYXNlV2ViQXBpU3ViamVjdCIsImp0aSI6IjQ3NmE3MTgzLWZlMTAtNGE0MS1hYmNmLWQ2MDVjMDFmOTBmYSIsImlhdCI6IjEyLzA0LzIwMjQgMTo1NzoyMCBhLsKgbS4iLCJpZFVzZXIiOiIxIiwiZXhwIjoyMTIzMTE0MjQwLCJpc3MiOiJodHRwczovL2xvY2FsaG9zdDo3MjAwLyIsImF1ZCI6Imh0dHBzOi8vbG9jYWxob3N0OjcyMDAvIn0.Ao9qSTlj833ByfWpZvkV2FfOrBK5Egms2oRrXAoVEYM',
-        },
-      );
-
-      if(response.statusCode==200){
-        String body = utf8.decode(response.bodyBytes);
-
-        final jsonData=jsonDecode(body);
-
-        for (var element in jsonData) {
-          // print(element["nombre"]);
-          productos.add(
-            Producto(
-              int.parse(element["idProducto"].toString()), 
-              element["nombre"].toString(), 
-              double.parse(element["cantidad"].toString()), 
-              double.parse(element["costo"].toString()), 
-              element["descripcion"].toString(), 
-              int.parse(element["estado"].toString())
-              )
-          );
-        }
-        setState(() {
-          _errorConexion=false;
-        });
-        return productos;
-      }else if(response.statusCode==403){
-        //Salir del aplicativo
-        print("salir del aplicativo");
-        throw Exception("Error en la peticion");
-
-      }else{
-        throw Exception("Error en la peticion");
-      }
-    }catch(error){
-      setState(() {
-        _errorConexion=true;
-      });
-      return [];
-    }
-  }
 
   
   @override
   void initState() {
     super.initState();
-    _listaProductos=_getProductos();
+    _listaProductos=getProductos();
   }
-  @override
-  void didChangeDependencies(){
-    super.didChangeDependencies();
-    _listaProductos=_getProductos();
-  }
+  
   Future<void> _refresh() async {
     setState(() {
       _isRefreshing=true;
     });
-    _listaProductos=_getProductos();
+    _listaProductos=getProductos();
     setState(() {
       _isRefreshing=false;
     });
@@ -97,17 +40,7 @@ class _PrdouctosIndexState extends State<PrdouctosIndex> {
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: _refresh,
-        child:_errorConexion==true?
-          SingleChildScrollView(
-            child: Container(
-              alignment: Alignment.center,
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              child:const Text("Error de conexion"),
-            ),
-          )
-          : 
-          Center(
+        child:Center(
           child: 
           SizedBox(
             width: MediaQuery.of(context).size.width * 0.9, // 80% del ancho
@@ -163,7 +96,14 @@ class _PrdouctosIndexState extends State<PrdouctosIndex> {
                       child: CircularProgressIndicator(),
                     );
                     } else if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
+                      return SingleChildScrollView(
+                        child: Container(
+                          alignment: Alignment.center,
+                          height: MediaQuery.of(context).size.height,
+                          width: MediaQuery.of(context).size.width,
+                          child:Text("${snapshot.error}"),
+                        ),
+                      );
                     }else {
                       List<Producto> productos = snapshot.data!;
                       return ListView.builder(
@@ -304,23 +244,21 @@ class _PrdouctosIndexState extends State<PrdouctosIndex> {
                                                   border:producto.estado==1?Border.all(color:Colors.transparent,width: 2): Border.all(color:Colors.grey.shade600,width: 2)
                                                 ),
                                                 child: Icon(Icons.delete, color: producto.estado==1?Colors.white:Colors.grey.shade600,size: 30,))
-                                            ),
-                                          ],
-                                        ),
-                                      )
-                                    ],
+                                              ),
+                                            ],
+                                          ),
+                                        )
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                
-                                
-                              ],
-                            ),
-                          );
-                        },
-                      );
-                    }
-                  },
-                ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      }
+                    },
+                  ),
                 )
               ],
             ),
@@ -335,7 +273,7 @@ class _PrdouctosIndexState extends State<PrdouctosIndex> {
           ).then((value) {
             if(value!=null){
               setState(() {
-                didChangeDependencies();
+                _refresh();
               });
             }
           });
@@ -384,7 +322,7 @@ Future <bool> _alertaCambiarEstado(BuildContext context,Producto productoACambia
             child: const Text('Aceptar',style: TextStyle(color: Colors.white),),
             onPressed: () async{
               Navigator.pop(context);
-              await _cambiarEstado(productoACambiar).then((response){
+              await cambiarEstado(productoACambiar).then((response){
                 completer.complete(response);
               });
             },
@@ -396,25 +334,6 @@ Future <bool> _alertaCambiarEstado(BuildContext context,Producto productoACambia
   return completer.future;
 }
 
-Future<bool>  _cambiarEstado(Producto productoACambiar) async {
-  productoACambiar.estado=productoACambiar.estado==1?0:1;
-  // Convertir el objeto a JSON
-  String productoJson = jsonEncode(productoACambiar);
-  final Uri url = Uri.parse("http://florezsena-001-site1.ltempurl.com/api/Productos/UpdateProduct");
-  final response = await http.put(
-    url,
-    headers: {
-      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJiYXNlV2ViQXBpU3ViamVjdCIsImp0aSI6IjQ3NmE3MTgzLWZlMTAtNGE0MS1hYmNmLWQ2MDVjMDFmOTBmYSIsImlhdCI6IjEyLzA0LzIwMjQgMTo1NzoyMCBhLsKgbS4iLCJpZFVzZXIiOiIxIiwiZXhwIjoyMTIzMTE0MjQwLCJpc3MiOiJodHRwczovL2xvY2FsaG9zdDo3MjAwLyIsImF1ZCI6Imh0dHBzOi8vbG9jYWxob3N0OjcyMDAvIn0.Ao9qSTlj833ByfWpZvkV2FfOrBK5Egms2oRrXAoVEYM',
-      'Content-Type': 'application/json'
-    },
-    body: productoJson,
-  );
-  if(response.statusCode==200){
-    return true;
-  }else{
-    return false;
-  }
-}
 
 
 Future<bool> _alertaEliminarProducto(BuildContext context,Producto productoAEliminar) async{
@@ -443,7 +362,7 @@ Future<bool> _alertaEliminarProducto(BuildContext context,Producto productoAElim
             child: const Text('Aceptar', style: TextStyle(color: Colors.white),),
             onPressed: () async{
               Navigator.pop(context);
-              await _eliminarProducto(productoAEliminar).then((response){
+              await eliminarProducto(productoAEliminar).then((response){
                 completer.complete(response);
               });
             },
@@ -455,18 +374,3 @@ Future<bool> _alertaEliminarProducto(BuildContext context,Producto productoAElim
   return completer.future;
 }
 
-Future<bool>  _eliminarProducto(Producto productoAEliminar) async {
-  final Uri url = Uri.parse("http://florezsena-001-site1.ltempurl.com/api/Productos/DeleteProduct/${productoAEliminar.idProducto}");
-  final response = await http.delete(
-    url,
-    headers: {
-      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJiYXNlV2ViQXBpU3ViamVjdCIsImp0aSI6IjQ3NmE3MTgzLWZlMTAtNGE0MS1hYmNmLWQ2MDVjMDFmOTBmYSIsImlhdCI6IjEyLzA0LzIwMjQgMTo1NzoyMCBhLsKgbS4iLCJpZFVzZXIiOiIxIiwiZXhwIjoyMTIzMTE0MjQwLCJpc3MiOiJodHRwczovL2xvY2FsaG9zdDo3MjAwLyIsImF1ZCI6Imh0dHBzOi8vbG9jYWxob3N0OjcyMDAvIn0.Ao9qSTlj833ByfWpZvkV2FfOrBK5Egms2oRrXAoVEYM',
-      'Content-Type': 'application/json'
-    },
-  );
-  if(response.statusCode==200){
-    return true;
-  }else{
-    return false;
-  }
-}
