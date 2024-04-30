@@ -21,38 +21,54 @@ class _PrdouctosIndexState extends State<PrdouctosIndex> {
   late Future<List<Producto>> _listaProductos;
   bool _isRefreshing = false;
   bool _isAlertaCambiarEstado=false;
+  bool _errorConexion=false;
   Future<List<Producto>>  _getProductos() async {
-    final Uri url = Uri.parse("http://florezsena-001-site1.ltempurl.com/api/Productos/GetProduct");
-    final response = await http.get(
-      url,
-      headers: {
-        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJiYXNlV2ViQXBpU3ViamVjdCIsImp0aSI6IjQ3NmE3MTgzLWZlMTAtNGE0MS1hYmNmLWQ2MDVjMDFmOTBmYSIsImlhdCI6IjEyLzA0LzIwMjQgMTo1NzoyMCBhLsKgbS4iLCJpZFVzZXIiOiIxIiwiZXhwIjoyMTIzMTE0MjQwLCJpc3MiOiJodHRwczovL2xvY2FsaG9zdDo3MjAwLyIsImF1ZCI6Imh0dHBzOi8vbG9jYWxob3N0OjcyMDAvIn0.Ao9qSTlj833ByfWpZvkV2FfOrBK5Egms2oRrXAoVEYM',
-      },
-    );
     List<Producto> productos=[];
 
-    if(response.statusCode==200){
-      String body = utf8.decode(response.bodyBytes);
+    final Uri url = Uri.parse("http://florezsena-001-site1.ltempurl.com/api/Productos/GetProduct");
+    try{
+      final response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJiYXNlV2ViQXBpU3ViamVjdCIsImp0aSI6IjQ3NmE3MTgzLWZlMTAtNGE0MS1hYmNmLWQ2MDVjMDFmOTBmYSIsImlhdCI6IjEyLzA0LzIwMjQgMTo1NzoyMCBhLsKgbS4iLCJpZFVzZXIiOiIxIiwiZXhwIjoyMTIzMTE0MjQwLCJpc3MiOiJodHRwczovL2xvY2FsaG9zdDo3MjAwLyIsImF1ZCI6Imh0dHBzOi8vbG9jYWxob3N0OjcyMDAvIn0.Ao9qSTlj833ByfWpZvkV2FfOrBK5Egms2oRrXAoVEYM',
+        },
+      );
 
-      final jsonData=jsonDecode(body);
+      if(response.statusCode==200){
+        String body = utf8.decode(response.bodyBytes);
 
-      for (var element in jsonData) {
-        // print(element["nombre"]);
-        productos.add(
-          Producto(
-            int.parse(element["idProducto"].toString()), 
-            element["nombre"].toString(), 
-            double.parse(element["cantidad"].toString()), 
-            double.parse(element["costo"].toString()), 
-            element["descripcion"].toString(), 
-            int.parse(element["estado"].toString())
-            )
-        );
+        final jsonData=jsonDecode(body);
+
+        for (var element in jsonData) {
+          // print(element["nombre"]);
+          productos.add(
+            Producto(
+              int.parse(element["idProducto"].toString()), 
+              element["nombre"].toString(), 
+              double.parse(element["cantidad"].toString()), 
+              double.parse(element["costo"].toString()), 
+              element["descripcion"].toString(), 
+              int.parse(element["estado"].toString())
+              )
+          );
+        }
+        setState(() {
+          _errorConexion=false;
+        });
+        return productos;
+      }else if(response.statusCode==403){
+        //Salir del aplicativo
+        print("salir del aplicativo");
+        throw Exception("Error en la peticion");
+
+      }else{
+        throw Exception("Error en la peticion");
       }
-
-      return productos;
-    }else{
-      throw Exception("Fallo la conexion a la api");
+    }catch(error){
+      setState(() {
+        _errorConexion=true;
+      });
+      return [];
     }
   }
 
@@ -81,7 +97,17 @@ class _PrdouctosIndexState extends State<PrdouctosIndex> {
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: _refresh,
-        child: Center(
+        child:_errorConexion==true?
+          SingleChildScrollView(
+            child: Container(
+              alignment: Alignment.center,
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+              child:const Text("Error de conexion"),
+            ),
+          )
+          : 
+          Center(
           child: 
           SizedBox(
             width: MediaQuery.of(context).size.width * 0.9, // 80% del ancho
@@ -138,7 +164,7 @@ class _PrdouctosIndexState extends State<PrdouctosIndex> {
                     );
                     } else if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
-                    } else {
+                    }else {
                       List<Producto> productos = snapshot.data!;
                       return ListView.builder(
                         itemCount: productos.length,
