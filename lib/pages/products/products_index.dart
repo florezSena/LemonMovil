@@ -47,6 +47,7 @@ class _PrdouctosIndexState extends State<PrdouctosIndex> {
 
     if(context.watch<ProductosProvider>().resetListP&&_isMetodo==false){
       _listaProductos=getProductos();
+      context.watch<ProductosProvider>().resetListFalse();
     }
 
     return Scaffold(

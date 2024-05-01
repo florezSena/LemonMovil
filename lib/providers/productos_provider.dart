@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 
 class ProductosProvider with ChangeNotifier{
-  final bool _resetListProductos=true;
+  bool _resetListProductos=false;
 
   bool get resetListP=>_resetListProductos;
 
   void resetList(){
+    _resetListProductos=true;
     notifyListeners();
+  }
+
+  void resetListFalse(){
+    _resetListProductos=false;
   }
 }

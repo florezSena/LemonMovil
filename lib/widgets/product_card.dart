@@ -1,10 +1,8 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:lemonapp/models/producto.dart';
 import 'package:lemonapp/pages/layout/layout_componentes.dart';
-import 'package:lemonapp/providers/alertas_provider.dart';
 import 'package:lemonapp/providers/metodos_provider.dart';
+import 'package:lemonapp/providers/productos_provider.dart';
 import 'package:lemonapp/services/service_product.dart';
 import 'package:provider/provider.dart';
 
@@ -21,7 +19,6 @@ class _ProductCardState extends State<ProductCard> {
   Widget build(BuildContext context) {
     Producto producto = widget.producto;
     String stringEstado=producto.estado==1?"Activo":"Inactivo";
-    bool isAlert=context.watch<AlertsProvider>().isAlertExecuteGet;
     bool isMetodo=context.watch<MetodosProvider>().isMetodoExecuteGet;
     return ExpansionTile(
       trailing: Switch(
@@ -29,43 +26,14 @@ class _ProductCardState extends State<ProductCard> {
         inactiveTrackColor: Colors.white,
         inactiveThumbColor: Colors.grey.shade600,
         value: producto.estado==1,
-        onChanged: (value) async {
-          if(!isMetodo){
+        onChanged: (value) {
+
+          if(isMetodo==false){
             context.read<MetodosProvider>().metodoExecuting();
-            await _alertaCambiarEstado(context,producto).then((value) {
-              context.read<MetodosProvider>().metodoExecuted();
-
-              if(isAlert==false){
-                                    context.read<AlertsProvider>().alertExecuting();
-
-                if(value==1){
-                  ScaffoldMessenger.of(context)
-                  .showSnackBar(
-                    const SnackBar(
-                      content: Text('Estado cambiado exitosamente',style: TextStyle(color:Colors.white),),
-                      duration: Duration(seconds: 3),
-                      backgroundColor: primaryColor,
-                    ),
-                  ).closed.then((value){
-                    context.read<AlertsProvider>().alertExecuted();
-                  });
-                }else if(value==2){
-                  ScaffoldMessenger.of(context)
-                  .showSnackBar(
-                    const SnackBar(
-                      content: Text('Error al cambiar el estado',style: TextStyle(color:Colors.white),),
-                      duration: Duration(seconds: 3),
-                      backgroundColor: Colors.black,
-                    ),
-                  );
-                }else{
-
-                }
-              }
-            },);
-            
+            _alertaCambiarEstado(context, producto);
           }
-        },
+
+        }
       ),
       backgroundColor: Colors.transparent,
       tilePadding: const EdgeInsets.only(left: 0),
@@ -108,31 +76,8 @@ class _ProductCardState extends State<ProductCard> {
                     ),
                     const Padding(padding: EdgeInsets.only(bottom: 17)),
                     GestureDetector(
-                      onTap: ()async {
-                        await _alertaEliminarProducto(context, producto).then((value){
-                          if(value){
-                            ScaffoldMessenger.of(context)
-                            .showSnackBar(
-                              const SnackBar(
-                                content: Text('Producto eliminado exitosamente',style: TextStyle(color:Colors.white),),
-                                duration: Duration(seconds: 3),
-                                backgroundColor: primaryColor,
-                              ),
-                            );
-                            setState(() {
-                              
-                            });
-                          }else{
-                            ScaffoldMessenger.of(context)
-                            .showSnackBar(
-                              const SnackBar(
-                                content: Text('Un producto asociado no puede ser eliminado',style: TextStyle(color:Colors.white),),
-                                duration: Duration(seconds: 3),
-                                backgroundColor: Colors.black,
-                              ),
-                            );
-                          }
-                        });
+                      onTap: () {
+                         _alertaEliminarProducto(context, producto);
                       },
                       child: Container(
                         padding:const EdgeInsets.all(5),
@@ -163,25 +108,71 @@ class _ProductCardState extends State<ProductCard> {
 
 
 
-Future <int> _alertaCambiarEstado(BuildContext context,Producto productoACambiar) async{
-  Completer<int> completer = Completer<int>();
+  void _alertaCambiarEstado(BuildContext context,Producto productoACambiar) {
+    int x =0;
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('¿Estas seguro de cambiar el estado?'),
+          actions: [
+            TextButton(
+              style:const ButtonStyle(
+                shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5)))),
+                backgroundColor: MaterialStatePropertyAll(Colors.black)
+              ),
+              child: const Text('Cancelar',style: TextStyle(color: Colors.white),),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            TextButton(
+              style:const ButtonStyle(
+                shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5)))),
+                backgroundColor: MaterialStatePropertyAll(primaryColor)
+              ),
+              child: const Text('Aceptar',style: TextStyle(color: Colors.white),),
+              onPressed: () async{
+                x=1;
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    ).then(
+    (value) async {
+      if(x==1){
+        await cambiarEstado(productoACambiar).then((response){
+          context.read<MetodosProvider>().metodoExecuted();
+          
+          if(response){
+            return alertFinal(context, response, "Estado cambiado");
+          }else{
+            return alertFinal(context, response, "Estado no se cambio");
+          }
+          
+        });
+      }else{
+          context.read<MetodosProvider>().metodoExecuted();
+      }
+    }
+  );
+}
+
+
+void alertFinal(BuildContext context,bool tipo,String descripcion) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: const Text('¿Estas seguro de cambiar el estado?'),
+        title: Column(
+          children: [
+            Text(tipo?"Exito":"Error"),
+            Text(descripcion,style:const TextStyle(fontSize: 20)),
+          ],
+        ),
         actions: [
-          TextButton(
-            style:const ButtonStyle(
-              shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5)))),
-              backgroundColor: MaterialStatePropertyAll(Colors.black)
-            ),
-            child: const Text('Cancelar',style: TextStyle(color: Colors.white),),
-            onPressed: () {
-              Navigator.pop(context);
-              completer.complete(0);
-            },
-          ),
           TextButton(
             style:const ButtonStyle(
               shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5)))),
@@ -190,27 +181,16 @@ Future <int> _alertaCambiarEstado(BuildContext context,Producto productoACambiar
             child: const Text('Aceptar',style: TextStyle(color: Colors.white),),
             onPressed: () async{
               Navigator.pop(context);
-              await cambiarEstado(productoACambiar).then((response){
-                completer.complete(response==true?1:2);
-              });
             },
           ),
         ],
       );
     },
   );
-  return completer.future;
 }
 
-
-
-
-
-
-
-
-Future<bool> _alertaEliminarProducto(BuildContext context,Producto productoAEliminar) async{
-  Completer<bool> completer = Completer<bool>();
+void _alertaEliminarProducto(BuildContext context,Producto productoAEliminar) {
+  int x=0;
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -234,17 +214,25 @@ Future<bool> _alertaEliminarProducto(BuildContext context,Producto productoAElim
             ),
             child: const Text('Aceptar', style: TextStyle(color: Colors.white),),
             onPressed: () async{
+              x=1;
               Navigator.pop(context);
-              await eliminarProducto(productoAEliminar).then((response){
-                completer.complete(response);
-              });
             },
           ),
         ],
       );
     },
-  );
-  return completer.future;
+  ).then((value) async{
+    if(x==1){
+      await eliminarProducto(productoAEliminar).then((response){
+        if(response){
+          context.read<ProductosProvider>().resetList();
+          alertFinal(context, true, 'Producto eliminado');
+        }else{
+          alertFinal(context, false, 'Este producto esta asociado');
+        }
+      });
+    }
+  });
 }
 
 
