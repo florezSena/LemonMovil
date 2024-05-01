@@ -1,9 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:lemonapp/pages/layout/layout_componentes.dart';
 import 'package:lemonapp/pages/layout/layout_index.dart';
+import 'package:lemonapp/providers/alertas_provider.dart';
+import 'package:lemonapp/providers/productos_provider.dart';
+import 'package:lemonapp/providers/metodos_provider.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => MetodosProvider()),
+        ChangeNotifierProvider(create: (_) => ProductosProvider()),
+        ChangeNotifierProvider(create: (_) => AlertsProvider()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
