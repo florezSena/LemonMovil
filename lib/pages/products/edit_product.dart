@@ -1,24 +1,30 @@
 
 import 'package:flutter/material.dart';
+import 'package:lemonapp/models/producto.dart';
 import 'package:lemonapp/pages/layout/layout_componentes.dart';
 import 'package:lemonapp/services/service_product.dart';
 
-class AddProduct extends StatefulWidget {
-  const AddProduct({super.key});
+class EditProduct extends StatefulWidget {
+  const EditProduct({super.key,required this.produtoSelect});
+  final Producto produtoSelect;
 
   @override
-  State<AddProduct> createState() => _AddProduct();
+  State<EditProduct> createState() => _EditProduct();
 }
 
-class _AddProduct extends State<AddProduct> {
+class _EditProduct extends State<EditProduct> {
   final _formKey = GlobalKey<FormState>();
   bool _isPosting=false;
   bool _alertDuplicated=false;
   TextEditingController nameController=TextEditingController(text: "");
-  TextEditingController? descripcionController = TextEditingController(text: null);
+  TextEditingController? descripcionController = TextEditingController();
 
+  
   @override
   Widget build(BuildContext context) {
+    Producto productSelect=widget.produtoSelect;
+    nameController.text=productSelect.nombre;
+    descripcionController!.text=productSelect.descripcion=="null"?"":productSelect.descripcion??"";
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -49,7 +55,7 @@ class _AddProduct extends State<AddProduct> {
                       Icon(Icons.shopping_basket),
                       Padding(padding: EdgeInsets.only(left: 5)),
                       Text(
-                        "Registrar Producto",
+                        "Editar Producto",
                         style: TextStyle(
                           fontSize: 24.0, // Tamaño de la fuente de 24.0
                         ),
@@ -127,6 +133,16 @@ class _AddProduct extends State<AddProduct> {
                     return null;
                   }
                 ),
+                const Padding(padding: EdgeInsets.only(bottom: 40)),
+                _isPosting==true?const Center(
+                  child: Column(
+                    children: [
+                      Text("Cargando..."),
+                      Padding(padding: EdgeInsets.only(bottom: 15)),
+                      CircularProgressIndicator(),
+                    ],
+                  ),
+                ):const Text("LEMON"),
                 const Spacer(),
                 SizedBox(
                   width: double.infinity,
@@ -137,8 +153,11 @@ class _AddProduct extends State<AddProduct> {
                         setState(() {
                           _isPosting=true;
                         });
+                        productSelect.nombre=nameController.text;
+                        productSelect.descripcion=descripcionController?.text;
 
-                        await duplicateName(nameController.text).then((nameDuplicated) async{
+
+                        await duplicateNameUpdate(productSelect).then((nameDuplicated) async{
                           if (nameDuplicated==true){
                             setState(() {
                               _isPosting=false;
@@ -161,12 +180,13 @@ class _AddProduct extends State<AddProduct> {
                               });
                             }
                           }else{
-                            await postProductos(nameController.text,descripcionController?.text).then((respuesta){
+                            productSelect.descripcion=productSelect.descripcion==""?null:productSelect.descripcion;
+                            await putProduct(productSelect).then((respuesta){
                               if(respuesta){
                                 ScaffoldMessenger.of(context)
                                 .showSnackBar(
                                   const SnackBar(
-                                    content: Text('Producto creado exitosamente',style: TextStyle(color:Colors.white),),
+                                    content: Text('Producto actualizado',style: TextStyle(color:Colors.white),),
                                     duration: Duration(seconds: 3),
                                     backgroundColor: primaryColor,
                                   ),
@@ -179,7 +199,7 @@ class _AddProduct extends State<AddProduct> {
                                 ScaffoldMessenger.of(context)
                                 .showSnackBar(
                                   const SnackBar(
-                                    content: Text('Error al crear el producto',style: TextStyle(color:Colors.white),),
+                                    content: Text('Error al actualizar el producto',style: TextStyle(color:Colors.white),),
                                     duration: Duration(seconds: 3),
                                     backgroundColor: Colors.black,
                                   ),
@@ -196,7 +216,7 @@ class _AddProduct extends State<AddProduct> {
                       borderRadius: BorderRadius.all(Radius.circular(5)), 
                     ),
                     ),
-                    child:const Text('Guardar',style: TextStyle(color: Colors.white),)
+                    child:const Text('Actualizar',style: TextStyle(color: Colors.white),)
                   ),
                 ),
                 SizedBox(
@@ -214,7 +234,7 @@ class _AddProduct extends State<AddProduct> {
                   ),
                   child:const Text('Cancelar',style: TextStyle(color: Colors.white)),
                   ),
-                )
+                ),
               ],
             ),
           )

@@ -61,14 +61,14 @@ class _PrdouctosIndexState extends State<PrdouctosIndex> {
               children: [
                 Container(
                   margin:const EdgeInsets.only(top: 20.0),
-                  child: Row(
+                  child:const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(Icons.shopping_basket),
                       Padding(padding: EdgeInsets.only(left: 5)),
                       Flexible(
                         child: Text(
-                          "Gestión de Productos ${_isMetodo}",
+                          "Gestión de Productos",
                           softWrap: true,
                           style: TextStyle(
                             fontSize: 24.0,

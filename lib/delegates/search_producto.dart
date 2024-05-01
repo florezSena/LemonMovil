@@ -71,13 +71,37 @@ class SearchProducto extends SearchDelegate<Producto?>{
       future: _getProductos(query), 
       builder: (context,snapshot){
         final productos=snapshot.data??[];
-        return ListView.builder(
-          itemCount: productos.length,
-          itemBuilder: (context,index){
-            final product=productos[index];
-            return ListTile(title: Text(product.nombre),);
-          }
-
+        if(productos.isEmpty && query!=""){
+          return const Center(child: Text("Producto no econtrado"));
+        }else if(productos.isEmpty && query==""){
+          return const Center(child: Text("Ingrese el nombre del producto a buscar"));
+        }
+        return Center(
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.9,
+            child: ListView.builder(
+              itemCount: productos.length,
+              itemBuilder: (context,index){
+                final product=productos[index];
+                return Container(
+                  margin: index == productos.length - 1 
+                  ? const EdgeInsets.only(bottom: 130.0,top:20)
+                  : const EdgeInsets.only(top: 20),
+                  padding:const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.grey,
+                      width: 0.5, 
+                    ),
+                    
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: ProductCard(producto:product )
+                );
+              }
+            
+            ),
+          ),
         );
       },
       );

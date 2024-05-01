@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lemonapp/models/producto.dart';
 import 'package:lemonapp/pages/layout/layout_componentes.dart';
+import 'package:lemonapp/pages/products/edit_product.dart';
 import 'package:lemonapp/providers/metodos_provider.dart';
 import 'package:lemonapp/providers/productos_provider.dart';
 import 'package:lemonapp/services/service_product.dart';
@@ -20,6 +21,7 @@ class _ProductCardState extends State<ProductCard> {
     Producto producto = widget.producto;
     String stringEstado=producto.estado==1?"Activo":"Inactivo";
     bool isMetodo=context.watch<MetodosProvider>().isMetodoExecuteGet;
+
     return ExpansionTile(
       trailing: Switch(
         
@@ -47,7 +49,6 @@ class _ProductCardState extends State<ProductCard> {
         borderRadius: BorderRadius.circular(5.0), // Redondeo de las esquinas
       ),
       children: [
-        
         ListTile(
           contentPadding:const EdgeInsets.all(0),
           subtitle: Row(
@@ -55,7 +56,7 @@ class _ProductCardState extends State<ProductCard> {
 
             children: [
               
-              Flexible(child: SizedBox(width: MediaQuery.of(context).size.width * 0.6,child: Text('#Producto: ${producto.idProducto}\nCantidad: ${producto.cantidad}\nCosto: ${producto.precio}\nDescripcion: ${producto.descripcion}\nEstado: $stringEstado',softWrap: true,))),
+              Flexible(child: SizedBox(width: MediaQuery.of(context).size.width * 0.6,child: Text('#Producto: ${producto.idProducto}\nCantidad: ${producto.cantidad}\nCosto: ${producto.precio}\nDescripcion: ${producto.descripcion=="null"?"sin descripcion":producto.descripcion}\nEstado: $stringEstado',softWrap: true,))),
               Padding(
                 padding: const EdgeInsets.only(right: 9),
                 child: Column(
@@ -63,7 +64,16 @@ class _ProductCardState extends State<ProductCard> {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        
+                        if(producto.estado==1){
+                          Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) =>  EditProduct(produtoSelect: producto,)),
+                        ).then((value) {
+                          if(value!=null){
+                            context.read<ProductosProvider>().resetList();
+                          }
+                        });
+                        }
                       },
                       child: Container(
                         padding:const EdgeInsets.all(5),
@@ -74,10 +84,14 @@ class _ProductCardState extends State<ProductCard> {
                         ),
                         child: Icon(Icons.edit, color: producto.estado==1?Colors.white:Colors.grey.shade600,size: 30, ))
                     ),
+
                     const Padding(padding: EdgeInsets.only(bottom: 17)),
+
                     GestureDetector(
                       onTap: () {
-                         _alertaEliminarProducto(context, producto);
+                        if(producto.estado==1){
+                          _alertaEliminarProducto(context, producto);
+                        }
                       },
                       child: Container(
                         padding:const EdgeInsets.all(5),
@@ -110,7 +124,9 @@ class _ProductCardState extends State<ProductCard> {
 
   void _alertaCambiarEstado(BuildContext context,Producto productoACambiar) {
     int x =0;
+    
     showDialog(
+      // barrierDismissible: false, para que no pueda darle a cualquier lado
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -169,6 +185,7 @@ void alertFinal(BuildContext context,bool tipo,String descripcion) {
         title: Column(
           children: [
             Text(tipo?"Exito":"Error"),
+            const Padding(padding: EdgeInsets.all(10)),
             Text(descripcion,style:const TextStyle(fontSize: 20)),
           ],
         ),
