@@ -82,7 +82,6 @@ class SearchProducto extends SearchDelegate<Producto?>{
         }
         if(context.watch<ProductosProvider>().productDeleteL!=0){
           productos.removeWhere((element) => element.idProducto==context.watch<ProductosProvider>().productDeleteL);
-          context.read<ProductosProvider>().resetIdProducto();
         }
         return Center(
           child: SizedBox(
@@ -130,7 +129,6 @@ class SearchProducto extends SearchDelegate<Producto?>{
         }
         if(_deleteId!=0){
           productos.removeWhere((element) => element.idProducto==context.watch<ProductosProvider>().productDeleteL);
-          context.read<ProductosProvider>().resetIdProducto();
         }
         return Center(
           child: SizedBox(
