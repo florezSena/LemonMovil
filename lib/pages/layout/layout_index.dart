@@ -3,8 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:lemonapp/pages/layout/layout_componentes.dart';
 import 'package:lemonapp/pages/products/products_index.dart';
 import 'package:lemonapp/pages/ventas/ventas_index.dart';
-import 'package:lemonapp/providers/productos_provider.dart';
-import 'package:provider/provider.dart';
 class LayoutIndex extends StatefulWidget {
   const LayoutIndex({super.key});
 
@@ -38,8 +36,6 @@ class _LayoutIndex extends State<LayoutIndex> {
             IconButton(
               icon:const Icon(Icons.logout, color: Colors.white,),
               onPressed: (){
-                                        context.read<ProductosProvider>().resetList();
-
               },
             ),
           ],

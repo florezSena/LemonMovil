@@ -44,10 +44,8 @@ class _PrdouctosIndexState extends State<PrdouctosIndex> {
   @override
   Widget build(BuildContext context) {
     _isMetodo=context.watch<MetodosProvider>().isMetodoExecuteGet;
-
-    if(context.watch<ProductosProvider>().resetListP&&_isMetodo==false){
+    if(context.watch<ProductosProvider>().resetListP==true && _isMetodo==false){
       _listaProductos=getProductos();
-      context.watch<ProductosProvider>().resetListFalse();
     }
 
     return Scaffold(
@@ -61,7 +59,7 @@ class _PrdouctosIndexState extends State<PrdouctosIndex> {
               children: [
                 Container(
                   margin:const EdgeInsets.only(top: 20.0),
-                  child:const Row(
+                  child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(Icons.shopping_basket),
@@ -82,9 +80,8 @@ class _PrdouctosIndexState extends State<PrdouctosIndex> {
                 GestureDetector(
                   onTap: () {
                     showSearch(context: context, delegate: SearchProducto()).then((value){
-                      if(value!=null){
-                        //en value hay un dato de tipo Producto
-                      }
+                      context.read<ProductosProvider>().resetList();
+                      context.read<ProductosProvider>().resetListFalse();
                     });
                   },
                   child: Container(
@@ -122,6 +119,18 @@ class _PrdouctosIndexState extends State<PrdouctosIndex> {
                       );
                     }else {
                       List<Producto> productos = snapshot.data!;
+                      if(context.watch<ProductosProvider>().productDeleteL!=0){
+                        productos.removeWhere((element) => element.idProducto==context.watch<ProductosProvider>().productDeleteL);
+                        context.read<ProductosProvider>().resetIdProducto();
+                      }
+                      if(context.watch<ProductosProvider>().productAdd!=null){
+                        productos.add(context.watch<ProductosProvider>().productAdd!);
+                        context.read<ProductosProvider>().resetProductAdd();
+                      }
+                      if(context.watch<ProductosProvider>().productUpdate!=null){
+                        productos[productos.indexWhere((producto) => producto.idProducto == context.watch<ProductosProvider>().productUpdate!.idProducto)]=context.watch<ProductosProvider>().productUpdate!;
+                        context.read<ProductosProvider>().resetProductUpdate();
+                      }
                       return ListView.builder(
                         itemCount: productos.length,
                         itemBuilder: (context, index) {
@@ -158,10 +167,11 @@ class _PrdouctosIndexState extends State<PrdouctosIndex> {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const AddProduct()),
-          ).then((value) {
+          ).then((value) async{
+            
             if(value!=null){
-              setState(() {
-                _refresh();
+              await getProductos().then((productos){
+                context.read<ProductosProvider>().addProductList(productos.last);
               });
             }
           });

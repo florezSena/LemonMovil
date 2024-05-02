@@ -2,7 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:lemonapp/models/producto.dart';
 import 'package:lemonapp/pages/layout/layout_componentes.dart';
+import 'package:lemonapp/providers/productos_provider.dart';
 import 'package:lemonapp/services/service_product.dart';
+import 'package:provider/provider.dart';
 
 class EditProduct extends StatefulWidget {
   const EditProduct({super.key,required this.produtoSelect});
@@ -183,6 +185,7 @@ class _EditProduct extends State<EditProduct> {
                             productSelect.descripcion=productSelect.descripcion==""?null:productSelect.descripcion;
                             await putProduct(productSelect).then((respuesta){
                               if(respuesta){
+                                context.read<ProductosProvider>().updateProductList(productSelect);
                                 ScaffoldMessenger.of(context)
                                 .showSnackBar(
                                   const SnackBar(
@@ -191,7 +194,7 @@ class _EditProduct extends State<EditProduct> {
                                     backgroundColor: primaryColor,
                                   ),
                                 );
-                                Navigator.pop(context,true);
+                                Navigator.pop(context,productSelect);
                               }else{
                                 setState(() {
                                   _isPosting=false;

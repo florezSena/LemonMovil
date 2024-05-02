@@ -68,11 +68,7 @@ class _ProductCardState extends State<ProductCard> {
                           Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) =>  EditProduct(produtoSelect: producto,)),
-                        ).then((value) {
-                          if(value!=null){
-                            context.read<ProductosProvider>().resetList();
-                          }
-                        });
+                        );
                         }
                       },
                       child: Container(
@@ -161,6 +157,7 @@ class _ProductCardState extends State<ProductCard> {
       if(x==1){
         await cambiarEstado(productoACambiar).then((response){
           context.read<MetodosProvider>().metodoExecuted();
+          context.read<ProductosProvider>().updateProductList(productoACambiar);
           
           if(response){
             return alertFinal(context, response, "Estado cambiado");
@@ -242,7 +239,7 @@ void _alertaEliminarProducto(BuildContext context,Producto productoAEliminar) {
     if(x==1){
       await eliminarProducto(productoAEliminar).then((response){
         if(response){
-          context.read<ProductosProvider>().resetList();
+          context.read<ProductosProvider>().deleteProducttList(productoAEliminar.idProducto);
           alertFinal(context, true, 'Producto eliminado');
         }else{
           alertFinal(context, false, 'Este producto esta asociado');

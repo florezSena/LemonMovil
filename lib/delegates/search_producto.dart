@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:lemonapp/models/producto.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:lemonapp/providers/productos_provider.dart';
 import 'package:lemonapp/widgets/product_card.dart';
+import 'package:provider/provider.dart';
 
 class SearchProducto extends SearchDelegate<Producto?>{
+  int _deleteId=-1;
   Future<List<Producto>>  _getProductos(String nombreSearch) async {
     
     final Uri url = Uri.parse("http://florezsena-001-site1.ltempurl.com/api/Productos/GetProductByName?nombre=$nombreSearch");
@@ -67,6 +70,7 @@ class SearchProducto extends SearchDelegate<Producto?>{
 
   @override
   Widget buildResults(BuildContext context) {
+    _deleteId=context.watch<ProductosProvider>().productDeleteL;
     return FutureBuilder(
       future: _getProductos(query), 
       builder: (context,snapshot){
@@ -75,6 +79,10 @@ class SearchProducto extends SearchDelegate<Producto?>{
           return const Center(child: Text("Producto no econtrado"));
         }else if(productos.isEmpty && query==""){
           return const Center(child: Text("Ingrese el nombre del producto a buscar"));
+        }
+        if(context.watch<ProductosProvider>().productDeleteL!=0){
+          productos.removeWhere((element) => element.idProducto==context.watch<ProductosProvider>().productDeleteL);
+          context.read<ProductosProvider>().resetIdProducto();
         }
         return Center(
           child: SizedBox(
@@ -110,6 +118,7 @@ class SearchProducto extends SearchDelegate<Producto?>{
 
   @override
   Widget buildSuggestions(BuildContext context) {
+    _deleteId=context.watch<ProductosProvider>().productDeleteL;
     return FutureBuilder(
       future: _getProductos(query), 
       builder: (context,snapshot){
@@ -118,6 +127,10 @@ class SearchProducto extends SearchDelegate<Producto?>{
           return const Center(child: Text("Producto no econtrado"));
         }else if(productos.isEmpty && query==""){
           return const Center(child: Text("Ingrese el nombre del producto a buscar"));
+        }
+        if(_deleteId!=0){
+          productos.removeWhere((element) => element.idProducto==context.watch<ProductosProvider>().productDeleteL);
+          context.read<ProductosProvider>().resetIdProducto();
         }
         return Center(
           child: SizedBox(
