@@ -18,6 +18,8 @@ class _EditProduct extends State<EditProduct> {
   final _formKey = GlobalKey<FormState>();
   bool _isPosting=false;
   bool _alertDuplicated=false;
+  bool textosPintados=false;
+
   TextEditingController nameController=TextEditingController(text: "");
   TextEditingController? descripcionController = TextEditingController();
 
@@ -25,8 +27,11 @@ class _EditProduct extends State<EditProduct> {
   @override
   Widget build(BuildContext context) {
     Producto productSelect=widget.produtoSelect;
-    nameController.text=productSelect.nombre;
-    descripcionController!.text=productSelect.descripcion=="null"?"":productSelect.descripcion??"";
+    if(!textosPintados){
+      nameController.text=productSelect.nombre;
+      descripcionController!.text=productSelect.descripcion=="null"?"":productSelect.descripcion??"";
+      textosPintados=true;
+    }
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -144,7 +149,7 @@ class _EditProduct extends State<EditProduct> {
                       CircularProgressIndicator(),
                     ],
                   ),
-                ):const Text("LEMON"),
+                ):const Text(""),
                 const Spacer(),
                 SizedBox(
                   width: double.infinity,
