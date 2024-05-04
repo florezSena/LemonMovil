@@ -32,19 +32,8 @@ class _EditProduct extends State<EditProduct> {
       descripcionController!.text=productSelect.descripcion=="null"?"":productSelect.descripcion??"";
       textosPintados=true;
     }
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor:primaryColor,
-        title:const Text("LEMON",style:TextStyle(color: Colors.white),),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon:const Icon(Icons.logout, color: Colors.white,),
-            onPressed: (){},
-          ),
-        ],
-      ),
+    return Scaffold(        
+      appBar: const CustomAppBar(),
       body: Center(child: 
         SizedBox(
           width: MediaQuery.of(context).size.width * 0.9,

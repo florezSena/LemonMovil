@@ -16,4 +16,14 @@ class Producto{
       'estado': estado,
     };
   }
+  static Producto fromJson(Map<String, dynamic> json) {
+    return Producto(
+      json['idProducto'],
+      json['nombre'],
+      json['cantidad'].toDouble(),
+      json['precio']==null?0:json['precio'].toDouble(),
+      json['descripcion'],
+      json['estado'],
+    );
+  }
 }
