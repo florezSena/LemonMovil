@@ -7,7 +7,7 @@ class Cliente{
   String telefono;
   int estado;
   Cliente(this.idCliente, this.tipoDocumento, this.documento,this.nombreRazonSocial,this.correo, this.telefono, this.estado);
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> clienteToJson() {
     return {
       'idCliente': idCliente,
       'tipoDocumento': tipoDocumento,
@@ -18,7 +18,7 @@ class Cliente{
       'estado': estado,
     };
   }
-  static Cliente fromJson(Map<String, dynamic> json) {
+  static Cliente clienteFromJson(Map<String, dynamic> json) {
     return Cliente(
       json['idCliente'],
       json['tipoDocumento'],

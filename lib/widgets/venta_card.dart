@@ -3,6 +3,9 @@ import 'package:intl/intl.dart';
 import 'package:lemonapp/models/venta.dart';
 import 'package:lemonapp/pages/layout/layout_componentes.dart';
 import 'package:lemonapp/pages/ventas/visualizar_venta.dart';
+import 'package:lemonapp/services/service_venta.dart';
+import 'package:lemonapp/widgets/alertas_widget.dart';
+import 'package:lemonapp/widgets/retroceder.dart';
 class VentaCard extends StatefulWidget {
   const VentaCard({super.key, required this.venta, required this.nVenta});
   final int nVenta;
@@ -22,7 +25,9 @@ class _VentaCardCardState extends State<VentaCard> {
     return ExpansionTile(
       trailing: TextButton(
         onPressed: () {
-          // Acción a realizar cuando se presiona el botón
+          if(venta.estado==1){
+            _alertaAnularVenta(context,venta);
+          }
         },
         style: ButtonStyle(
           minimumSize: MaterialStateProperty.all<Size>(const Size(75, 20)),
@@ -67,7 +72,7 @@ class _VentaCardCardState extends State<VentaCard> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) =>  VisualizarVenta(venta: venta,nVenta: nVenta,)),
+                          SlidePageRoute(page: VisualizarVenta(venta: venta, nVenta: nVenta)),
                         );
                       },
                       child: Container(
@@ -91,3 +96,50 @@ class _VentaCardCardState extends State<VentaCard> {
       );
   }
 }
+
+
+void _alertaAnularVenta(BuildContext context,Venta ventaAAnular) {
+  int x=0;
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('¿Estas seguro de eliminar el producto?'),
+        actions: [
+          TextButton(
+            style:const ButtonStyle(
+              shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5)))),
+              backgroundColor: MaterialStatePropertyAll(Colors.black)
+            ),
+            child: const Text('Cancelar', style: TextStyle(color: Colors.white),),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          TextButton(
+            style:const ButtonStyle(
+              shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5)))),
+              backgroundColor: MaterialStatePropertyAll(primaryColor)
+            ),
+            child: const Text('Aceptar', style: TextStyle(color: Colors.white),),
+            onPressed: () async{
+              x=1;
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      );
+    },
+  ).then((value) async{
+    if(x==1){
+      await anularVenta(ventaAAnular).then((response){
+        if(response){
+          alertFinal(context, true, 'Venta anulada');
+        }else{
+          alertFinal(context, false, 'Error al anular la venta');
+        }
+      });
+    }
+  });
+}
+

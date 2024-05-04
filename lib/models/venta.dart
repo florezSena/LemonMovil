@@ -8,14 +8,13 @@ class Venta{
   int estado;
   Cliente idClienteNavigation;
   Venta(this.idVenta, this.idCliente, this.fecha,this.total, this.estado, this.idClienteNavigation);
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> ventaToJson() {
     return {
       'idVenta': idVenta,
       'idCliente': idCliente,
-      'fecha': fecha,
+      'fecha': fecha.toIso8601String(),
       'total': total,
       'estado': estado,
-      'idClienteNavigation': idClienteNavigation,
     };
   }
 }

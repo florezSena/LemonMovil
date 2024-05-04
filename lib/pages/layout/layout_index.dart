@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:lemonapp/pages/layout/layout_componentes.dart';
 import 'package:lemonapp/pages/products/products_index.dart';
 import 'package:lemonapp/pages/ventas/ventas_index.dart';
+import 'package:lemonapp/providers/metodos_provider.dart';
+import 'package:provider/provider.dart';
 class LayoutIndex extends StatefulWidget {
   const LayoutIndex({super.key});
 
@@ -11,12 +13,14 @@ class LayoutIndex extends StatefulWidget {
 
 class _LayoutIndex extends State<LayoutIndex> {
   int _pageActual=0;
+
   final List<Widget> _pagesList= [
     const PrdouctosIndex(),
     const VentasIndex()
   ];
   @override
   Widget build(BuildContext context){
+    bool isMetodo=context.watch<MetodosProvider>().isMetodoExecuteGet;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -28,9 +32,11 @@ class _LayoutIndex extends State<LayoutIndex> {
         body: _pagesList[_pageActual],
         bottomNavigationBar: BottomNavigationBar(
         onTap: (index) {
-          setState(() {
-            _pageActual=index;
-          });
+          if(!isMetodo){
+            setState(() {
+              _pageActual=index;
+            });
+          }
         },
         currentIndex:_pageActual,
         items: const [

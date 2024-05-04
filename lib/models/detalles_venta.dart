@@ -9,7 +9,7 @@ class DetallesVenta{
   double subtotal;
   Producto idProductoNavigation;
   DetallesVenta(this.idDetalleVenta, this.idVenta,this.idProducto , this.cantidad,this.precioKilo, this.subtotal, this.idProductoNavigation);
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> detallesVentaToJson() {
     return {
       'idDetalleVenta': idDetalleVenta,
       'idVenta': idVenta,

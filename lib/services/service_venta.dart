@@ -31,11 +31,11 @@ Future<List<Venta>> getVentas() async {
             DateTime.parse(element['fecha']),
             element['total'].toDouble(),
             element['estado'],
-            Cliente.fromJson(element['idClienteNavigation']),
+            Cliente.clienteFromJson(element['idClienteNavigation']),
           )
         );
       }
-      
+      ventas.sort((a, b) => b.fecha.compareTo(a.fecha));
       return ventas;
     }else if(response.statusCode==403){
       //Salir del aplicativo
@@ -76,7 +76,7 @@ Future<List<DetallesVenta>> getDetalleVentas(int idVenta) async {
             element['cantidad'].toDouble(),
             element['precioKilo'].toDouble(),
             element['subtotal'].toDouble(),
-            Producto.fromJson(element['idProductoNavigation']),
+            Producto.productoFromJson(element['idProductoNavigation']),
           )
         );
       }
@@ -91,5 +91,77 @@ Future<List<DetallesVenta>> getDetalleVentas(int idVenta) async {
     }
   }catch(error){
     throw Exception("Error de catch: $error");
+  }
+}
+
+Future<bool>  anularVenta(Venta ventaAAnular) async {
+  try{
+    //Traemos los detalles de la venta para saber cual es el producto que debemos restar
+    final Uri urlDetallesVenta = Uri.parse("$httpUrl/DetalleVentums/GetDetallesVenta?id=${ventaAAnular.idVenta}");
+    final responseDetalleVenta = await http.get(
+      urlDetallesVenta,
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+    //Si la respuesta no es 200 hubo un error
+    if(responseDetalleVenta.statusCode!=200){
+      return false;
+    }
+    String body = utf8.decode(responseDetalleVenta.bodyBytes);
+
+    final detallesVentaJson=jsonDecode(body);
+    //A cada producto del detalle le vamos a restar la cantidad vendida
+    for (var detalleVenta in detallesVentaJson) {
+      //Traemos el proudcto del detalle
+      final Uri urlGetProduct = Uri.parse("$httpUrl/Productos/GetProductById?id=${detalleVenta["idProducto"]}");
+      final responseGetProudct = await http.get(
+        urlGetProduct,
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+      if(responseGetProudct.statusCode!=200){
+        return false;
+      }
+      String body = utf8.decode(responseGetProudct.bodyBytes);
+      final productoJson=jsonDecode(body);
+      
+      //Le restamos la cantidad del detalle(hacer un if productoJson["cantidad"]==0 si es necesario)
+      productoJson["cantidad"]=productoJson["cantidad"]-detalleVenta["cantidad"];
+      String productoJsonNew = jsonEncode(productoJson);
+      //Y mandamos a actualizar el producto
+      final Uri urlCantidadNew = Uri.parse("$httpUrl/Productos/UpdateProduct");
+      final responseCantidadNew = await http.put(
+        urlCantidadNew,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json'
+        },
+        body: productoJsonNew
+      );
+      if(responseCantidadNew.statusCode!=200){
+        return false;
+      }
+    }
+    
+    ventaAAnular.estado=0;
+    // Convertir la venta a JSON
+    String ventaJson = jsonEncode(ventaAAnular.ventaToJson());
+    final Uri urlAnularVenta = Uri.parse("$httpUrl/Ventums/UpdateVenta");
+    final responseAnularVenta = await http.put(
+      urlAnularVenta,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json'
+      },
+      body: ventaJson,
+    );
+    if(responseAnularVenta.statusCode!=200){
+      return false;
+    }
+    return true;
+  }catch(_){
+    return false;
   }
 }

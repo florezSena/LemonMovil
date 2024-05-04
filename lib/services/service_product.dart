@@ -76,7 +76,7 @@ Future<bool>  eliminarProducto(Producto productoAEliminar) async {
 Future<bool>  cambiarEstado(Producto productoACambiar) async {
   productoACambiar.estado=productoACambiar.estado==1?0:1;
   // Convertir el objeto a JSON
-  String productoJson = jsonEncode(productoACambiar);
+  String productoJson = jsonEncode(productoACambiar.productoToJson());
   final Uri url = Uri.parse("$httpUrl/Productos/UpdateProduct");
   try{
     final response = await http.put(
@@ -130,7 +130,7 @@ Future<bool>  postProductos(String name,String? descripcion) async {
 }
 
 Future<bool>  putProduct(Producto productoEdit) async {
-  String productoJson = jsonEncode(productoEdit);
+  String productoJson = jsonEncode(productoEdit.productoToJson());
   final Uri url = Uri.parse("$httpUrl/Productos/UpdateProduct");
   final response = await http.put(
     url,

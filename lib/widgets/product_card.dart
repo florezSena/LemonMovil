@@ -5,6 +5,7 @@ import 'package:lemonapp/pages/products/edit_product.dart';
 import 'package:lemonapp/providers/metodos_provider.dart';
 import 'package:lemonapp/providers/productos_provider.dart';
 import 'package:lemonapp/services/service_product.dart';
+import 'package:lemonapp/widgets/alertas_widget.dart';
 import 'package:provider/provider.dart';
 
 class ProductCard extends StatefulWidget {
@@ -155,8 +156,12 @@ class _ProductCardState extends State<ProductCard> {
     ).then(
     (value) async {
       if(x==1){
+          context.read<MetodosProvider>().modalExecuting();
+
         await cambiarEstado(productoACambiar).then((response){
           context.read<MetodosProvider>().metodoExecuted();
+          context.read<MetodosProvider>().modalExecuted();
+
           context.read<ProductosProvider>().updateProductList(productoACambiar);
           
           if(response){
@@ -174,34 +179,7 @@ class _ProductCardState extends State<ProductCard> {
 }
 
 
-void alertFinal(BuildContext context,bool tipo,String descripcion) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Column(
-          children: [
-            Text(tipo?"Exito":"Error"),
-            const Padding(padding: EdgeInsets.all(10)),
-            Text(descripcion,style:const TextStyle(fontSize: 20)),
-          ],
-        ),
-        actions: [
-          TextButton(
-            style:const ButtonStyle(
-              shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5)))),
-              backgroundColor: MaterialStatePropertyAll(primaryColor)
-            ),
-            child: const Text('Aceptar',style: TextStyle(color: Colors.white),),
-            onPressed: () async{
-              Navigator.pop(context);
-            },
-          ),
-        ],
-      );
-    },
-  );
-}
+
 
 void _alertaEliminarProducto(BuildContext context,Producto productoAEliminar) {
   int x=0;

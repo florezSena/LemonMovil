@@ -6,7 +6,7 @@ class Producto{
   String? descripcion;
   int estado;
   Producto(this.idProducto, this.nombre, this.cantidad,this.precio, this.descripcion, this.estado);
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> productoToJson() {
     return {
       'idProducto': idProducto,
       'nombre': nombre,
@@ -16,7 +16,7 @@ class Producto{
       'estado': estado,
     };
   }
-  static Producto fromJson(Map<String, dynamic> json) {
+  static Producto productoFromJson(Map<String, dynamic> json) {
     return Producto(
       json['idProducto'],
       json['nombre'],
