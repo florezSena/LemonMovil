@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:lemonapp/models/venta.dart';
 import 'package:lemonapp/pages/layout/layout_componentes.dart';
+import 'package:lemonapp/pages/ventas/crear_venta.dart';
 import 'package:lemonapp/services/service_venta.dart';
+import 'package:lemonapp/widgets/retroceder.dart';
 import 'package:lemonapp/widgets/venta_card.dart'; //Para formaterar la fecha a dipo hora:minuto
 class VentasIndex extends StatefulWidget {
   const VentasIndex({super.key});
@@ -141,7 +143,10 @@ class _VentasIndexState extends State<VentasIndex> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: (){
-            
+            Navigator.push(
+              context,
+              SlidePageRoute(page:const CrearVenta()),
+            );
           },
           backgroundColor: primaryColor,
           foregroundColor: Colors.white,

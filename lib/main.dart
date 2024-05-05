@@ -3,6 +3,7 @@ import 'package:lemonapp/pages/layout/layout_componentes.dart';
 import 'package:lemonapp/pages/layout/layout_index.dart';
 import 'package:lemonapp/providers/productos_provider.dart';
 import 'package:lemonapp/providers/metodos_provider.dart';
+import 'package:lemonapp/providers/ventas_provider.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -11,7 +12,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => MetodosProvider()),
         ChangeNotifierProvider(create: (_) => ProductosProvider()),
-
+        ChangeNotifierProvider(create: (_) => VentasProvider()),
       ],
       child: const MyApp(),
     ),
@@ -23,12 +24,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return   MaterialApp(
+      routes: {
+        '/':(context) =>const LayoutIndex()
+      },
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: primaryColor),
         useMaterial3: true,
       ),
-      debugShowCheckedModeBanner: false,
-      home:const LayoutIndex(),
+      debugShowCheckedModeBanner: false
     );
   }
 }
