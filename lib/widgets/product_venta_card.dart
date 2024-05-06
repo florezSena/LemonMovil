@@ -1,0 +1,53 @@
+import 'package:flutter/material.dart';
+import 'package:lemonapp/models/producto.dart';
+import 'package:lemonapp/pages/layout/layout_componentes.dart';
+class ProductVentaCard extends StatefulWidget {
+  const ProductVentaCard({super.key, required this.producto, required this.onProductSelected});
+  final Producto producto;
+  final Function onProductSelected;
+  @override
+  State<ProductVentaCard> createState() => _ProductVentaCardState();
+}
+
+class _ProductVentaCardState extends State<ProductVentaCard> {
+
+  @override
+  Widget build(BuildContext context) {
+    Producto producto = widget.producto;
+    String stringEstado=producto.estado==1?"Activo":"Inactivo";
+    return ExpansionTile(
+      trailing: Container(
+        padding:const EdgeInsets.all(1),
+        decoration: BoxDecoration(
+          color:primaryColor,
+          borderRadius: BorderRadius.circular(5),
+          border:Border.all(color:Colors.transparent,width: 0)
+        ),
+        child: IconButton(
+          onPressed: () {
+            widget.onProductSelected(context,producto);
+          },
+          icon:const Icon(Icons.add, color: Colors.white,size: 30,),
+        ),
+      ),
+      backgroundColor: Colors.transparent,
+      tilePadding: const EdgeInsets.only(left: 0),
+      title: Text(producto.nombre),
+      subtitle: producto.cantidad<1?const Text("Producto con poco stock",style: TextStyle(color: Colors.grey),):null,
+      shape: RoundedRectangleBorder( 
+        side:const BorderSide( 
+          color: Colors.transparent, 
+          width: 0,
+        ),
+        borderRadius: BorderRadius.circular(5.0), // Redondeo de las esquinas
+      ),
+      children: [
+        ListTile(
+          contentPadding:const EdgeInsets.all(0),
+          subtitle: SizedBox(width: MediaQuery.of(context).size.width * 0.6,child: Text('#Producto: ${producto.idProducto}\nCantidad: ${producto.cantidad}\nCosto: ${producto.costo}\nDescripcion: ${producto.descripcion=="null"?"sin descripcion":producto.descripcion}\nEstado: $stringEstado',softWrap: true,)),
+        ),
+      ],
+    );
+  }
+}
+

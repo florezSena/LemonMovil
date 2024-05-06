@@ -2,16 +2,16 @@ class Producto{
   int idProducto;
   String nombre;
   double cantidad;
-  double precio;
+  double costo;
   String? descripcion;
   int estado;
-  Producto(this.idProducto, this.nombre, this.cantidad,this.precio, this.descripcion, this.estado);
+  Producto(this.idProducto, this.nombre, this.cantidad,this.costo, this.descripcion, this.estado);
   Map<String, dynamic> productoToJson() {
     return {
       'idProducto': idProducto,
       'nombre': nombre,
       'cantidad': cantidad,
-      'precio': precio,
+      'costo': costo,
       'descripcion': descripcion,
       'estado': estado,
     };
@@ -21,7 +21,7 @@ class Producto{
       json['idProducto'],
       json['nombre'],
       json['cantidad'].toDouble(),
-      json['precio']==null?0:json['precio'].toDouble(),
+      json['costo']==null?0:json['costo'].toDouble(),
       json['descripcion'],
       json['estado'],
     );

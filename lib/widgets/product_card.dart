@@ -57,7 +57,7 @@ class _ProductCardState extends State<ProductCard> {
 
             children: [
               
-              Flexible(child: SizedBox(width: MediaQuery.of(context).size.width * 0.6,child: Text('#Producto: ${producto.idProducto}\nCantidad: ${producto.cantidad}\nCosto: ${producto.precio}\nDescripcion: ${producto.descripcion=="null"?"sin descripcion":producto.descripcion}\nEstado: $stringEstado',softWrap: true,))),
+              Flexible(child: SizedBox(width: MediaQuery.of(context).size.width * 0.6,child: Text('#Producto: ${producto.idProducto}\nCantidad: ${producto.cantidad}\nCosto: ${producto.costo}\nDescripcion: ${producto.descripcion=="null"?"sin descripcion":producto.descripcion}\nEstado: $stringEstado',softWrap: true,))),
               Padding(
                 padding: const EdgeInsets.only(right: 9),
                 child: Column(

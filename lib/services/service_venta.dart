@@ -165,3 +165,50 @@ Future<bool>  anularVenta(Venta ventaAAnular) async {
     return false;
   }
 }
+
+Future<List<Cliente>> getClientes(String nombre) async {
+  List<Cliente> clientes=[];
+
+  final Uri url = Uri.parse("$httpUrl/Clientes/GetClients");
+  try{
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if(response.statusCode==200){
+      String body = utf8.decode(response.bodyBytes);
+
+      final jsonData=jsonDecode(body);
+
+      for (var element in jsonData) {
+        String nombreRazonSocial = element['nombreRazonSocial'].toLowerCase();
+        String nombreLower=nombre.toLowerCase();
+        if (nombreRazonSocial.contains(nombreLower) && element["estado"]==1) {
+          clientes.add(
+            Cliente(
+              element['idCliente'],
+              element['tipoDocumento'],
+              BigInt.parse(element['documento'].toString()),
+              element['nombreRazonSocial'],
+              element['correo'],
+              element['telefono'],
+              element['estado'],
+            )
+          );
+        }
+      }
+      return clientes;
+    }else if(response.statusCode==403){
+      //Salir del aplicativo
+      throw Exception("Sin permisos");
+
+    }else{
+      throw Exception("Error en la peticion ${response.statusCode}");
+    }
+  }catch(error){
+    throw Exception("Error de catch: $error");
+  }
+}

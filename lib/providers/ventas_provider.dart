@@ -5,35 +5,50 @@ import 'package:lemonapp/models/detalles_venta.dart';
 class VentasProvider with ChangeNotifier{
   bool _carritoVenta = false;
   bool _clienteVenta = false;
-  bool _ventaCancelada = false;
+  bool _botonCancelar = true;
+  bool _botonCliente = false;
+
 
   
   List<DetallesVenta> productosAVender=[];
-  Cliente? cliente;
+   Cliente? _clienteSeleccionado;
 
   bool get carritoVentaGet=>_carritoVenta;
 
   bool get clienteVentaGet=>_clienteVenta;
 
-  bool get ventaCanceladaGet=>_ventaCancelada;
+  bool get botonCancelarGet=>_botonCancelar;
 
-  void cancelarVenta(){
-    _clienteVenta=true;
+  bool get botonClienteGet=>_botonCliente;
+
+  Cliente? get clienteGet=> _clienteSeleccionado;
+
+
+  void deleteBotonCliente(){
+    _botonCliente=false;
     notifyListeners();
   }
-  void resetCancelarVenta(){
-    _clienteVenta=false;
+  void showBotonCliente(){
+    _botonCliente=true;
+    notifyListeners();
+  }
+  void deleteBotonCancelar(){
+    _botonCancelar=false;
+    notifyListeners();
+  }
+  void resetBotonCancelar(){
+    _botonCancelar=true;
     notifyListeners();
   }
 
   void addCliente(Cliente cliente){
-    cliente = cliente;
+    _clienteSeleccionado = cliente;
     _clienteVenta=true;
     notifyListeners();
   }
   
   void deleteCliente(){
-    cliente = null;
+    _clienteSeleccionado=null;
     _clienteVenta=false;
     notifyListeners();
   }

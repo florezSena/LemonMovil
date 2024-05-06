@@ -90,3 +90,36 @@ Future <bool> alertaCancelarVenta(BuildContext context) async{
   return completer.future;
 }
 
+void alertaValidacionDeVista(BuildContext context,String title,String subtitle){
+  showModalBottomSheet(
+    backgroundColor: Colors.transparent,
+    isScrollControlled: true,
+
+    context: context, 
+    builder:(context) {
+      return AlertDialog(
+        title: Text(title),
+        actions: [
+          Text(subtitle),
+          const Padding(padding: EdgeInsets.only(top: 20)),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton(
+                style:const ButtonStyle(
+                  shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5)))),
+                  backgroundColor: MaterialStatePropertyAll(primaryColor)
+                ),
+                child: const Text('Aceptar', style: TextStyle(color: Colors.white),),
+                onPressed: () {
+                  Navigator.pop(context,true);
+                },
+              ),
+            ],
+          ),
+        ],
+      );  
+    },
+  );
+}
+
