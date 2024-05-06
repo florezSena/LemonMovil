@@ -8,6 +8,7 @@ class Venta{
   int estado;
   Cliente idClienteNavigation;
   Venta(this.idVenta, this.idCliente, this.fecha,this.total, this.estado, this.idClienteNavigation);
+  //de Tipo Venta a Json
   Map<String, dynamic> ventaToJson() {
     return {
       'idVenta': idVenta,
@@ -16,5 +17,15 @@ class Venta{
       'total': total,
       'estado': estado,
     };
+  }
+  static Venta ventaFromJson(Map<String, dynamic> json) {
+    return Venta(
+      json['idVenta'],
+      json['idCliente'],
+      json['fecha'],
+      json['total']==null?0:json['total'].toDouble(),
+      json['estado'],
+      json["idClienteNavigation"]
+    );
   }
 }

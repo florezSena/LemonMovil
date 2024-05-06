@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:lemonapp/delegates/search_cliente_venta.dart';
 import 'package:lemonapp/delegates/search_producto_venta.dart';
 import 'package:lemonapp/models/cliente.dart';
+import 'package:lemonapp/models/detalles_venta.dart';
 import 'package:lemonapp/pages/layout/layout_componentes.dart';
 import 'package:lemonapp/pages/ventas/crear_venta/carrito_venta.dart';
+import 'package:lemonapp/pages/ventas/crear_venta/final_venta.dart';
 import 'package:lemonapp/pages/ventas/crear_venta/select_cliente.dart';
 import 'package:lemonapp/providers/ventas_provider.dart';
+import 'package:lemonapp/services/service_venta.dart';
 import 'package:lemonapp/widgets/alertas_widget.dart';
 import 'package:lemonapp/widgets/modal_add_producto.dart';
 import 'package:provider/provider.dart';
@@ -29,11 +32,12 @@ class _CrearVentaState extends State<CrearVenta>with SingleTickerProviderStateMi
   Widget build(BuildContext context) {
     bool isCarrito=context.watch<VentasProvider>().carritoVentaGet;
     bool isCliente=context.watch<VentasProvider>().clienteVentaGet;
+    bool isRealizar=context.watch<VentasProvider>().botonRealizarGet;
     bool mostrarBotonCancelar=context.watch<VentasProvider>().botonCancelarGet;
     bool showBotonCliente=context.watch<VentasProvider>().botonClienteGet;
-    Cliente? cliente=context.watch<VentasProvider>().clienteGet;
-
-
+    List<DetallesVenta> detallesVenta=context.watch<VentasProvider>().productosAVender;
+    Cliente? clienteVenta =context.watch<VentasProvider>().clienteGet;
+    String textBotonSiguiente="Siguiente";
     Color colorSiguiente;
     if(isCarrito==false){
       colorSiguiente=Colors.black;
@@ -41,6 +45,9 @@ class _CrearVentaState extends State<CrearVenta>with SingleTickerProviderStateMi
       colorSiguiente=Colors.black;
     }else{
       colorSiguiente=primaryColor;
+    }
+    if(isRealizar){
+      textBotonSiguiente="Realizar";
     }
     bool ventaCancelada=false;
     return DefaultTabController(
@@ -53,6 +60,11 @@ class _CrearVentaState extends State<CrearVenta>with SingleTickerProviderStateMi
             alertaCancelarVenta(context).then((value){
               if(value){
                 ventaCancelada=true;
+                context.read<VentasProvider>().resetBotonCancelar();
+                context.read<VentasProvider>().deleteBotonCliente();
+                context.read<VentasProvider>().deleteBotonRelizar();
+
+                
                 Navigator.pop(context);
               }else{
                 ventaCancelada=false;
@@ -75,15 +87,20 @@ class _CrearVentaState extends State<CrearVenta>with SingleTickerProviderStateMi
                   if(value!=0 && isCarrito==true){
                     context.read<VentasProvider>().deleteBotonCancelar();
                     context.read<VentasProvider>().showBotonCliente();
-
+                    if(value==1){
+                      context.read<VentasProvider>().deleteBotonRelizar();
+                    }else if(value==2){
+                      context.read<VentasProvider>().showBotonRealizar();
+                    }
                   }else if(value==0){
                     context.read<VentasProvider>().resetBotonCancelar();
                     context.read<VentasProvider>().deleteBotonCliente();
-
                   }
                   if(isCarrito==false){
+                    alertaValidacionDeVista(context,"No tienes productos agregados","Debes agregar almenos un producto para continuar con el registro de la venta");
                     _tabController.index=0;
                   }else if(isCliente==false && value==2){
+                    alertaValidacionDeVista(context,"No elegiste el cliente","Debes elegir un cliente continuar con el registro de la venta");
                     _tabController.index=1;
                   }
                 },
@@ -93,9 +110,9 @@ class _CrearVentaState extends State<CrearVenta>with SingleTickerProviderStateMi
                   controller: _tabController,
                   physics:const NeverScrollableScrollPhysics(),
                   children: [
-                    CarritoVenta(),
-                    SelecetCliente(),
-                    Text("${cliente==null?"1":cliente.correo}",),
+                    const CarritoVenta(),
+                    const SelecetCliente(),
+                    FinalVenta(detallesVenta: context.watch<VentasProvider>().productosAVender, cliente: context.watch<VentasProvider>().clienteGet),
                   ]
                 ),
               )
@@ -125,7 +142,6 @@ class _CrearVentaState extends State<CrearVenta>with SingleTickerProviderStateMi
                   child:const Text("Agregar producto", style: TextStyle(color: Colors.white),),
                 ):const SizedBox(),
 
-                const Padding(padding: EdgeInsets.only(top: 5)),
                 showBotonCliente?ElevatedButton(
                   onPressed: (){
                     showSearch(context: context, delegate: SearchClienteVenta()).then((value){
@@ -144,6 +160,7 @@ class _CrearVentaState extends State<CrearVenta>with SingleTickerProviderStateMi
                   ),
                   child:const Text("Agregar cliente", style: TextStyle(color: Colors.white),),
                 ):const SizedBox(),
+                
                 const Padding(padding: EdgeInsets.only(top: 5)),
 
                 ElevatedButton(
@@ -154,12 +171,38 @@ class _CrearVentaState extends State<CrearVenta>with SingleTickerProviderStateMi
                       _tabController.index=1;
                     }else if(_tabController.index==1 && isCliente){
                       _tabController.index=2;
+                      context.read<VentasProvider>().showBotonRealizar();
                       context.read<VentasProvider>().deleteBotonCliente();
                     }else if(_tabController.index==0 && isCarrito==false){
                       alertaValidacionDeVista(context,"No tienes productos agregados","Debes agregar almenos un producto para continuar con el registro de la venta");
                     }
                     else if(_tabController.index==1 && isCliente==false){
                       alertaValidacionDeVista(context,"No elegiste el cliente","Debes elegir un cliente continuar con el registro de la venta");
+                    }else if(_tabController.index==2){
+                      alertaRealizarVenta(context).then((value) async{
+                        alertaCargando(context);
+                        if(value==true){
+                          await realizarVenta(detallesVenta, clienteVenta).then((value){
+                            Navigator.pop(context);
+                            if(value){
+                              alertFinal(context, true, "Venta realizada con exito").then((value){
+                                context.read<VentasProvider>().resetBotonCancelar();
+                                context.read<VentasProvider>().deleteBotonCliente();
+                                context.read<VentasProvider>().deleteBotonRelizar();
+                                context.read<VentasProvider>().deleteAllProductCarrito();
+                                context.read<VentasProvider>().deleteCliente();
+
+                                
+                                ventaCancelada=true;
+                                Navigator.pop(context);
+                              });
+                            }else{
+                              alertFinal(context, false, "No se pudo realizar la venta");
+                            }
+                          });
+                        }
+                        
+                      });
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -170,7 +213,7 @@ class _CrearVentaState extends State<CrearVenta>with SingleTickerProviderStateMi
                     borderRadius: BorderRadius.circular(5),
                   ),
                   ),
-                  child:const Text("Siguiente", style: TextStyle(color: Colors.white),),
+                  child: Text(textBotonSiguiente, style: const TextStyle(color: Colors.white),),
                 ),
                 const Padding(padding: EdgeInsets.only(top: 5)),
                 mostrarBotonCancelar==false? ElevatedButton(
@@ -182,6 +225,7 @@ class _CrearVentaState extends State<CrearVenta>with SingleTickerProviderStateMi
                     }else if(_tabController.index==2){
                       _tabController.index=1;
                       context.read<VentasProvider>().showBotonCliente();
+                      context.read<VentasProvider>().deleteBotonRelizar();
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -199,6 +243,7 @@ class _CrearVentaState extends State<CrearVenta>with SingleTickerProviderStateMi
                     alertaCancelarVenta(context).then((value) {
                       if(value){
                         ventaCancelada=true;
+                        context.read<VentasProvider>().deleteBotonRelizar();
                         Navigator.pop(context);
                       }
                     });
@@ -213,7 +258,6 @@ class _CrearVentaState extends State<CrearVenta>with SingleTickerProviderStateMi
                   ),
                   child:const Text("Cancelar", style: TextStyle(color: Colors.white),),
                 ):const SizedBox(),
-                
               ],
             ),
           ),

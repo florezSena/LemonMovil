@@ -7,11 +7,13 @@ class VentasProvider with ChangeNotifier{
   bool _clienteVenta = false;
   bool _botonCancelar = true;
   bool _botonCliente = false;
+  bool _botonRelizar = false;
+
 
 
   
   List<DetallesVenta> productosAVender=[];
-   Cliente? _clienteSeleccionado;
+  Cliente? _clienteSeleccionado;
 
   bool get carritoVentaGet=>_carritoVenta;
 
@@ -21,8 +23,18 @@ class VentasProvider with ChangeNotifier{
 
   bool get botonClienteGet=>_botonCliente;
 
-  Cliente? get clienteGet=> _clienteSeleccionado;
+  bool get botonRealizarGet=>_botonRelizar;
 
+
+  Cliente? get clienteGet=> _clienteSeleccionado;
+   void deleteBotonRelizar(){
+    _botonRelizar=false;
+    notifyListeners();
+  }
+  void showBotonRealizar(){
+    _botonRelizar=true;
+    notifyListeners();
+  }
 
   void deleteBotonCliente(){
     _botonCliente=false;

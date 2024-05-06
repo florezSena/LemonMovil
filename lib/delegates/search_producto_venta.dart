@@ -3,6 +3,7 @@ import 'package:lemonapp/models/producto.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:lemonapp/providers/productos_provider.dart';
+import 'package:lemonapp/services/service_venta.dart';
 import 'package:lemonapp/widgets/product_venta_card.dart';
 import 'package:provider/provider.dart';
 
@@ -75,13 +76,13 @@ class SearchProductoVenta extends SearchDelegate<Producto?>{
   Widget buildResults(BuildContext context) {
     _deleteId=context.watch<ProductosProvider>().productDeleteL;
     return FutureBuilder(
-      future: _getProductos(query), 
+      future: getProductosVenta(query), 
       builder: (context,snapshot){
         final productos=snapshot.data??[];
         if(productos.isEmpty && query!=""){
           return const Center(child: Text("Producto no econtrado"));
         }else if(productos.isEmpty && query==""){
-          return const Center(child: Text("Ingrese el nombre del producto a buscar"));
+          return const Center(child: CircularProgressIndicator());
         }
         if(context.watch<ProductosProvider>().productDeleteL!=0){
           productos.removeWhere((element) => element.idProducto==context.watch<ProductosProvider>().productDeleteL);
@@ -122,13 +123,13 @@ class SearchProductoVenta extends SearchDelegate<Producto?>{
   Widget buildSuggestions(BuildContext context) {
     _deleteId=context.watch<ProductosProvider>().productDeleteL;
     return FutureBuilder(
-      future: _getProductos(query), 
+      future: getProductosVenta(query), 
       builder: (context,snapshot){
         final productos=snapshot.data??[];
         if(productos.isEmpty && query!=""){
           return const Center(child: Text("Producto no econtrado"));
         }else if(productos.isEmpty && query==""){
-          return const Center(child: Text("Ingrese el nombre del producto a buscar"));
+          return const Center(child: CircularProgressIndicator());
         }
         if(_deleteId!=0){
           productos.removeWhere((element) => element.idProducto==context.watch<ProductosProvider>().productDeleteL);

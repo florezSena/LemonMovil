@@ -17,7 +17,17 @@ class DetallesVenta{
       'cantidad': cantidad,
       'precioKilo': precioKilo,
       'subtotal': subtotal,
-      'idProductoNavigation': idProductoNavigation,
     };
+  }
+  static DetallesVenta detallesVentaFromJson(Map<String, dynamic> json) {
+    return DetallesVenta(
+      json['idDetalleVenta'],
+      json['idVenta'],
+      json['idProducto'],
+      json['cantidad']==null?0:json['cantidad'].toDouble(),
+      json['precioKilo'],
+      json['subtotal'],
+      json["idProductoNavigation"]
+    );
   }
 }

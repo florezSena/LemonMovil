@@ -168,7 +168,6 @@ Future<bool>  anularVenta(Venta ventaAAnular) async {
 
 Future<List<Cliente>> getClientes(String nombre) async {
   List<Cliente> clientes=[];
-
   final Uri url = Uri.parse("$httpUrl/Clientes/GetClients");
   try{
     final response = await http.get(
@@ -177,12 +176,9 @@ Future<List<Cliente>> getClientes(String nombre) async {
         'Authorization': 'Bearer $token',
       },
     );
-
     if(response.statusCode==200){
       String body = utf8.decode(response.bodyBytes);
-
       final jsonData=jsonDecode(body);
-
       for (var element in jsonData) {
         String nombreRazonSocial = element['nombreRazonSocial'].toLowerCase();
         String nombreLower=nombre.toLowerCase();
@@ -204,10 +200,132 @@ Future<List<Cliente>> getClientes(String nombre) async {
     }else if(response.statusCode==403){
       //Salir del aplicativo
       throw Exception("Sin permisos");
-
     }else{
       throw Exception("Error en la peticion ${response.statusCode}");
     }
+  }catch(error){
+    throw Exception("Error de catch: $error");
+  }
+}
+
+Future<List<Producto>> getProductosVenta(String nombre) async {
+  List<Producto> productos=[];
+  final Uri url = Uri.parse("$httpUrl/Productos/GetProduct");
+  try{
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+    if(response.statusCode==200){
+      String body = utf8.decode(response.bodyBytes);
+      final jsonData=jsonDecode(body);
+      for (var element in jsonData) {
+        String nombreAbuscar = element['nombre'].toLowerCase();
+        String nombreLower=nombre.toLowerCase();
+        if (nombreAbuscar.contains(nombreLower) && element["estado"]==1 && element["cantidad"]>0) {
+          productos.add(
+            Producto(
+              int.parse(element["idProducto"].toString()), 
+              element["nombre"].toString(), 
+              double.parse(element["cantidad"].toString()), 
+              double.parse(element["costo"].toString()), 
+              element["descripcion"].toString(), 
+              int.parse(element["estado"].toString())
+            )
+          );
+        }
+      }
+      return productos;
+    }else if(response.statusCode==403){
+      //Salir del aplicativo
+      throw Exception("Sin permisos");
+    }else{
+      throw Exception("Error en la peticion ${response.statusCode}");
+    }
+  }catch(error){
+    throw Exception("Error de catch: $error");
+  }
+}
+
+
+Future<bool> realizarVenta(List<DetallesVenta> detalles,Cliente? cliente) async {
+  double total=0;
+  int ultimoIdVenta=0;
+  for(DetallesVenta detalle in detalles){
+    total+=detalle.subtotal;
+  }
+  total = double.parse(total.toStringAsFixed(2));
+
+  final Uri url = Uri.parse("$httpUrl/Ventums/InsertVenta");
+  try{
+    Venta newVenta =Venta(0,cliente!.idCliente,DateTime.now(),total,1,cliente);
+    String ventaString = jsonEncode(newVenta.ventaToJson());
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json'
+      },
+      body: ventaString
+    );
+
+    if(response.statusCode==200){
+      final Uri urlUltimaVenta = Uri.parse("$httpUrl/Ventums/GetVentas");
+      final response = await http.get(
+        urlUltimaVenta,
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if(response.statusCode==200){
+        String body = utf8.decode(response.bodyBytes);
+        final jsonData=jsonDecode(body);
+        if (jsonData is List && jsonData.isNotEmpty) {
+          jsonData.sort((a, b) => b['idVenta'].compareTo(a['idVenta']));
+          ultimoIdVenta = jsonData.first['idVenta'];
+        }
+      }else{
+        return false;
+      }
+      
+      final Uri urlDetalle = Uri.parse("$httpUrl/DetalleVentums/InsertDetalleVenta");
+      for(DetallesVenta detalle in detalles){
+        detalle.idVenta=ultimoIdVenta;
+        String detalleString = jsonEncode(detalle.detallesVentaToJson());
+        final responseDetalle = await http.post(
+          urlDetalle,
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json'
+          },
+          body: detalleString
+        );
+        if(responseDetalle.statusCode==200){
+          detalle.idProductoNavigation.cantidad-=detalle.cantidad;
+          String productoJson = jsonEncode(detalle.idProductoNavigation.productoToJson());
+          final Uri urlUpdateProduct = Uri.parse("$httpUrl/Productos/UpdateProduct");
+          final responseUpdateProducto = await http.put(
+            urlUpdateProduct,
+            headers: {
+              'Authorization': 'Bearer $token',
+              'Content-Type': 'application/json'
+            },
+            body: productoJson
+          );
+          if(responseUpdateProducto.statusCode!=200){
+            return false;
+          }
+        }else{
+          return false;
+        }
+      }
+
+      return true;
+    }
+    return false;
   }catch(error){
     throw Exception("Error de catch: $error");
   }

@@ -32,7 +32,7 @@ Future<List<Producto>> getProductos() async {
             double.parse(element["costo"].toString()), 
             element["descripcion"].toString(), 
             int.parse(element["estado"].toString())
-            )
+          )
         );
       }
       

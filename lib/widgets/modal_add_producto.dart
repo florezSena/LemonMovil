@@ -61,11 +61,11 @@ void modalAddProduct(BuildContext context,Producto producto)  {
                     
                     ElevatedButton(
                       onPressed: () async{
-                        double cantidadAvender= double.parse(cantidadAComprarController.text);
-                        double precioKilo= double.parse(precioController.text);
-                        double subtotal=cantidadAvender*precioKilo;
-                        subtotal = double.parse(subtotal.toStringAsFixed(2));
                         if (formKey.currentState!.validate()) {
+                          double cantidadAvender= double.parse(cantidadAComprarController.text);
+                          double precioKilo= double.parse(precioController.text);
+                          double subtotal=cantidadAvender*precioKilo;
+                          subtotal = double.parse(subtotal.toStringAsFixed(2));
                           context.read<VentasProvider>().addProductCarrito(DetallesVenta(0, 0, producto.idProducto, cantidadAvender, precioKilo, subtotal, producto));
                           Navigator.pop(context);
                         }
