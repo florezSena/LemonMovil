@@ -330,3 +330,43 @@ Future<bool> realizarVenta(List<DetallesVenta> detalles,Cliente? cliente) async 
     throw Exception("Error de catch: $error");
   }
 }
+Future<List<Venta>> getVentasQuery(String query) async {
+  List<Venta> ventas=[];
+    final Uri url = Uri.parse("$httpUrl/Ventums/GetVentas");
+
+  try{
+
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if(response.statusCode==200){
+      String body = utf8.decode(response.bodyBytes);
+
+      final jsonData=jsonDecode(body);
+
+      for (var element in jsonData) {
+        Cliente cliente=  Cliente.clienteFromJson(element['idClienteNavigation']);
+        if(cliente.nombreRazonSocial.toLowerCase().contains(query.toLowerCase())){
+          ventas.add(
+            Venta(
+              element['idVenta'],
+              element['idCliente'],
+              DateTime.parse(element['fecha']),
+              element['total'].toDouble(),
+              element['estado'],
+              Cliente.clienteFromJson(element['idClienteNavigation']),
+            )
+          );
+        }
+      }
+      }
+      ventas.sort((a, b) => b.fecha.compareTo(a.fecha));
+      return ventas;
+  }catch(error){
+    throw Exception("Error de catch: $error");
+  }
+}

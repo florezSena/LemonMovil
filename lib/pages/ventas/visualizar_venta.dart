@@ -5,9 +5,8 @@ import 'package:lemonapp/pages/layout/layout_componentes.dart';
 import 'package:lemonapp/services/service_venta.dart';
 
 class VisualizarVenta extends StatelessWidget {
-  const VisualizarVenta({super.key, required this.venta, required this.nVenta});
+  const VisualizarVenta({super.key, required this.venta});
   final Venta venta;
-  final int nVenta;
   @override
   Widget build(BuildContext context) {
     Future <List<DetallesVenta>> detallesVenta=getDetalleVentas(venta.idVenta);
@@ -20,14 +19,14 @@ class VisualizarVenta extends StatelessWidget {
             children: [
               Container(
                 margin:const EdgeInsets.only(top: 20.0),
-                child:Row(
+                child:const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.monetization_on),
-                    const Padding(padding: EdgeInsets.only(left: 5)),
+                    Icon(Icons.monetization_on),
+                    Padding(padding: EdgeInsets.only(left: 5)),
                     Flexible(
                       child: Text(
-                        "Venta: #$nVenta",
+                        "Informacion de la Venta",
                         softWrap: true,
                         style: const TextStyle(
                           fontSize: 24.0,
@@ -48,7 +47,7 @@ class VisualizarVenta extends StatelessWidget {
                   borderRadius: BorderRadius.circular(5),
                 ),
                 child: ListTile(
-                  title: Text("Fecha ${venta.fecha}\nTotal: \$${venta.total}\nEstado: ${venta.estado==1?"Realizada":"Anulada"}\nCliente: ${venta.idClienteNavigation.nombreRazonSocial}"),
+                  title: Text("Fecha ${venta.fecha}\nTotal: \$${venta.total}\nEstado: ${venta.estado==1?"Realizada":"Anulada"}\nCliente: ${venta.idClienteNavigation.nombreRazonSocial}\n#Cliente: ${venta.idClienteNavigation.documento}"),
                 ),
               ),
               Container(

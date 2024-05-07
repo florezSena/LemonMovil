@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lemonapp/delegates/search_venta.dart';
 import 'package:lemonapp/models/venta.dart';
 import 'package:lemonapp/pages/layout/layout_componentes.dart';
 import 'package:lemonapp/pages/ventas/crear_venta.dart';
@@ -71,7 +72,10 @@ class _VentasIndexState extends State<VentasIndex> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      (){};
+                      
+                        showSearch(context: context, delegate: SearchVenta()).then((value){
+                        });
+                  
                     },
                     child: Container(
                     
@@ -107,13 +111,11 @@ class _VentasIndexState extends State<VentasIndex> {
                           ),
                         );
                       }else {
-                        int nVenta= 0;
                         List<Venta> ventas = snapshot.data!;
                         return ListView.builder(
                           itemCount: ventas.length,
                           itemBuilder: (context, index) {
                             Venta venta = ventas[index];
-                            nVenta++;
                             return Container(
                               margin: index == ventas.length - 1 
                               ? const EdgeInsets.only(bottom: 130.0,top:20)
@@ -128,7 +130,7 @@ class _VentasIndexState extends State<VentasIndex> {
                                 borderRadius: BorderRadius.circular(5),
                               ),
           
-                              child: VentaCard(venta: venta, nVenta: nVenta)
+                              child: VentaCard(venta: venta)
                               );
                             },
                           );

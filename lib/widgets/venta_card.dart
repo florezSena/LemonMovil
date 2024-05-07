@@ -7,8 +7,7 @@ import 'package:lemonapp/services/service_venta.dart';
 import 'package:lemonapp/widgets/alertas_widget.dart';
 import 'package:lemonapp/widgets/retroceder.dart';
 class VentaCard extends StatefulWidget {
-  const VentaCard({super.key, required this.venta, required this.nVenta});
-  final int nVenta;
+  const VentaCard({super.key, required this.venta});
   final Venta venta;
   @override
   State<VentaCard> createState() => _VentaCardCardState();
@@ -19,7 +18,6 @@ class _VentaCardCardState extends State<VentaCard> {
   @override
   Widget build(BuildContext context) {
     Venta venta = widget.venta;
-    int nVenta=widget.nVenta;
     String stringEstado=venta.estado==1?"Realizada":"Anulada";
 
     return ExpansionTile(
@@ -62,7 +60,7 @@ class _VentaCardCardState extends State<VentaCard> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
             children: [
-              Flexible(child: SizedBox(width: MediaQuery.of(context).size.width * 0.6,child: Text('#Venta: $nVenta\nTotal de la venta: ${venta.total}\nEstado: $stringEstado\nCliente: ${venta.idClienteNavigation.nombreRazonSocial}',softWrap: true,))),
+              Flexible(child: SizedBox(width: MediaQuery.of(context).size.width * 0.6,child: Text('#Cliente: ${venta.idClienteNavigation.documento}\nTotal de la venta: ${venta.total}\nEstado: $stringEstado\nCliente: ${venta.idClienteNavigation.nombreRazonSocial}',softWrap: true,))),
               Padding(
                 padding: const EdgeInsets.only(right: 0),
                 child: Column(
@@ -72,7 +70,7 @@ class _VentaCardCardState extends State<VentaCard> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          SlidePageRoute(page: VisualizarVenta(venta: venta, nVenta: nVenta)),
+                          SlidePageRoute(page: VisualizarVenta(venta: venta)),
                         );
                       },
                       child: Container(
