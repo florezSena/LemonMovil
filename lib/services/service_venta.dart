@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:intl/intl.dart';
 import 'package:lemonapp/models/cliente.dart';
 import 'package:lemonapp/models/detalles_venta.dart';
 import 'package:lemonapp/models/producto.dart';
@@ -349,8 +350,11 @@ Future<List<Venta>> getVentasQuery(String query) async {
       final jsonData=jsonDecode(body);
 
       for (var element in jsonData) {
-        Cliente cliente=  Cliente.clienteFromJson(element['idClienteNavigation']);
-        if(cliente.nombreRazonSocial.toLowerCase().contains(query.toLowerCase())){
+        // Cliente cliente=  Cliente.clienteFromJson(element['idClienteNavigation']);
+        // if(cliente.nombreRazonSocial.toLowerCase().contains(query.toLowerCase())){
+        DateTime fechaDeventa=      DateTime.parse(element['fecha']);
+        String fechaFormateada=DateFormat('dd/MM/yyyy hh:mm a').format(fechaDeventa);
+        if(fechaFormateada.contains(query)){
           ventas.add(
             Venta(
               element['idVenta'],

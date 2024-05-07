@@ -44,7 +44,7 @@ class _VentaCardCardState extends State<VentaCard> {
       ),
       backgroundColor: Colors.transparent,
       tilePadding: const EdgeInsets.only(left: 0),
-      title: Text(DateFormat('dd/MM/yyyy\nHH:mm').format(venta.fecha),),
+      title: Text(DateFormat('dd/MM/yyyy\nhh:mm a').format(venta.fecha),),
       subtitle: venta.estado==0?const Text("Esta venta ha sido anulada",style: TextStyle(color: Colors.grey),):null,
       shape: RoundedRectangleBorder( 
         side:const BorderSide( 

@@ -77,7 +77,7 @@ class SearchVenta extends SearchDelegate<Venta?>{
       builder: (context,snapshot){
         final ventas=snapshot.data??[];
         if(ventas.isEmpty && query!=""){
-          return const Center(child: Text("Cliente no econtrado"));
+          return const Center(child: Text("Venta no econtrada"));
         }else if(ventas.isEmpty && query==""){
           return const Center(child: CircularProgressIndicator());
         }

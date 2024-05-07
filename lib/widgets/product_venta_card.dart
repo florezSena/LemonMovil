@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:lemonapp/models/detalles_venta.dart';
 import 'package:lemonapp/models/producto.dart';
 import 'package:lemonapp/pages/layout/layout_componentes.dart';
+import 'package:lemonapp/providers/ventas_provider.dart';
+import 'package:lemonapp/widgets/alertas_widget.dart';
+import 'package:provider/provider.dart';
 class ProductVentaCard extends StatefulWidget {
   const ProductVentaCard({super.key, required this.producto, required this.onProductSelected});
   final Producto producto;
@@ -10,9 +14,10 @@ class ProductVentaCard extends StatefulWidget {
 }
 
 class _ProductVentaCardState extends State<ProductVentaCard> {
-
   @override
   Widget build(BuildContext context) {
+    List<DetallesVenta> detalles=context.watch<VentasProvider>().productosAVender;
+    List<int> idsDetalles = detalles.map((detalle) => detalle.idProducto).toList();
     Producto producto = widget.producto;
     String stringEstado=producto.estado==1?"Activo":"Inactivo";
     return ExpansionTile(
@@ -25,7 +30,11 @@ class _ProductVentaCardState extends State<ProductVentaCard> {
         ),
         child: IconButton(
           onPressed: () {
-            widget.onProductSelected(context,producto);
+            if (idsDetalles.contains(producto.idProducto)) {
+              alertFinal(context, false, "Este producto ya está agregado");
+            } else {
+              widget.onProductSelected(context, producto);
+            }
           },
           icon:const Icon(Icons.add, color: Colors.white,size: 30,),
         ),
