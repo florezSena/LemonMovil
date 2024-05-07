@@ -12,7 +12,7 @@ class LayoutIndex extends StatefulWidget {
 }
 
 class _LayoutIndex extends State<LayoutIndex> {
-  int _pageActual=1;
+  int _pageActual=0;
 
   final List<Widget> _pagesList= [
     const PrdouctosIndex(),

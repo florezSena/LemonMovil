@@ -21,7 +21,7 @@ class _VentaCardCardState extends State<VentaCard> {
   Widget build(BuildContext context) {
     Venta venta = widget.venta;
     String stringEstado=venta.estado==1?"Realizada":"Anulada";
-
+    String formattedTotal = venta.total.toStringAsFixed(2).replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match match) => '${match[1]}.');
     return ExpansionTile(
       trailing: TextButton(
         onPressed: () {
@@ -69,7 +69,7 @@ class _VentaCardCardState extends State<VentaCard> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
             children: [
-              Flexible(child: SizedBox(width: MediaQuery.of(context).size.width * 0.6,child: Text('#Cliente: ${venta.idClienteNavigation.documento}\nTotal de la venta: ${venta.total}\nEstado: $stringEstado\nCliente: ${venta.idClienteNavigation.nombreRazonSocial}',softWrap: true,))),
+              Flexible(child: SizedBox(width: MediaQuery.of(context).size.width * 0.6,child: Text('#Cliente: ${venta.idClienteNavigation.documento}\nTotal de la venta: \$$formattedTotal\nEstado: $stringEstado\nCliente: ${venta.idClienteNavigation.nombreRazonSocial}',softWrap: true,))),
               Padding(
                 padding: const EdgeInsets.only(right: 0),
                 child: Column(
@@ -83,7 +83,7 @@ class _VentaCardCardState extends State<VentaCard> {
                         );
                       },
                       child: Container(
-                        padding:const EdgeInsets.only(top: 3,bottom: 3,left: 20,right: 20),
+                        padding:const EdgeInsets.only(top: 2,bottom: 2,left: 20,right: 20),
                         decoration: BoxDecoration(
                           
                           color:Colors.grey.shade600,

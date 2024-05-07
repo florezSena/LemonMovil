@@ -28,7 +28,7 @@ class VisualizarVenta extends StatelessWidget {
                       child: Text(
                         "Informacion de la Venta",
                         softWrap: true,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 24.0,
                         ),
                       ),

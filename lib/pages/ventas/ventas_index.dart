@@ -152,7 +152,7 @@ class _VentasIndexState extends State<VentasIndex> {
               if(value!=null){
                 _refresh();
               }
-            });;
+            });
           },
           backgroundColor: primaryColor,
           foregroundColor: Colors.white,
