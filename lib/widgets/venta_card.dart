@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:lemonapp/models/venta.dart';
@@ -24,7 +26,14 @@ class _VentaCardCardState extends State<VentaCard> {
       trailing: TextButton(
         onPressed: () {
           if(venta.estado==1){
-            _alertaAnularVenta(context,venta);
+            _alertaAnularVenta(context,venta).then((value){
+              if(value){
+                setState(() {
+                  venta.estado=0;
+                });
+              }
+            });
+            
           }
         },
         style: ButtonStyle(
@@ -96,13 +105,17 @@ class _VentaCardCardState extends State<VentaCard> {
 }
 
 
-void _alertaAnularVenta(BuildContext context,Venta ventaAAnular) {
+Future<bool> _alertaAnularVenta(BuildContext context,Venta ventaAAnular) async{
+  Completer<bool> completer = Completer<bool>();
+  
   int x=0;
-  showDialog(
+  showModalBottomSheet(
+    backgroundColor: Colors.transparent,
+    isScrollControlled: true,
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: const Text('¿Estas seguro de eliminar el producto?'),
+        title: const Text('¿Estas seguro de anular la venta?'),
         actions: [
           TextButton(
             style:const ButtonStyle(
@@ -130,14 +143,21 @@ void _alertaAnularVenta(BuildContext context,Venta ventaAAnular) {
     },
   ).then((value) async{
     if(x==1){
+      alertaCargando(context);
       await anularVenta(ventaAAnular).then((response){
+        Navigator.pop(context);
         if(response){
+          completer.complete(true);
           alertFinal(context, true, 'Venta anulada');
         }else{
+          completer.complete(false);
           alertFinal(context, false, 'Error al anular la venta');
         }
       });
+    }else{
+      completer.complete(true);
     }
   });
+  return completer.future;
 }
 

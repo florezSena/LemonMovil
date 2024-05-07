@@ -166,10 +166,9 @@ class _PrdouctosIndexState extends State<PrdouctosIndex> {
       floatingActionButton: FloatingActionButton(
         onPressed: (){
           Navigator.push(
-              context,
-              SlidePageRoute(page:const AddProduct()),
-            ).then((value) async{
-            
+            context,
+            SlidePageRoute(page:const AddProduct()),
+          ).then((value) async{  
             if(value!=null){
               await getProductos().then((productos){
                 context.read<ProductosProvider>().addProductList(productos.last);

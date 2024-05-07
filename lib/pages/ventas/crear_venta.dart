@@ -195,7 +195,7 @@ class _CrearVentaState extends State<CrearVenta>with SingleTickerProviderStateMi
                                 context.read<VentasProvider>().deleteCliente();
                                 
                                 ventaCancelada=true;
-                                Navigator.pop(context);
+                                Navigator.pop(context,true);
                               });
                             }else{
                               alertFinal(context, false, "No se pudo realizar la venta");

@@ -5,7 +5,7 @@ import 'package:lemonapp/pages/layout/layout_componentes.dart';
 import 'package:lemonapp/pages/ventas/crear_venta.dart';
 import 'package:lemonapp/services/service_venta.dart';
 import 'package:lemonapp/widgets/retroceder.dart';
-import 'package:lemonapp/widgets/venta_card.dart'; //Para formaterar la fecha a dipo hora:minuto
+import 'package:lemonapp/widgets/venta_card.dart';
 class VentasIndex extends StatefulWidget {
   const VentasIndex({super.key});
 
@@ -148,7 +148,11 @@ class _VentasIndexState extends State<VentasIndex> {
             Navigator.push(
               context,
               SlidePageRoute(page:const CrearVenta()),
-            );
+            ).then((value) async{
+              if(value!=null){
+                _refresh();
+              }
+            });;
           },
           backgroundColor: primaryColor,
           foregroundColor: Colors.white,

@@ -126,7 +126,9 @@ class _ProductCardState extends State<ProductCard> {
   void _alertaCambiarEstado(BuildContext context,Producto productoACambiar) {
     int x =0;
     
-    showDialog(
+    showModalBottomSheet(
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
       // barrierDismissible: false, para que no pueda darle a cualquier lado
       context: context,
       builder: (BuildContext context) {
@@ -186,7 +188,9 @@ class _ProductCardState extends State<ProductCard> {
 
 void _alertaEliminarProducto(BuildContext context,Producto productoAEliminar) {
   int x=0;
-  showDialog(
+  showModalBottomSheet(
+    backgroundColor: Colors.transparent,
+    isScrollControlled: true,
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(

@@ -9,9 +9,6 @@ class VentasProvider with ChangeNotifier{
   bool _botonCliente = false;
   bool _botonRelizar = false;
 
-
-
-  
   List<DetallesVenta> productosAVender=[];
   Cliente? _clienteSeleccionado;
 
@@ -25,9 +22,9 @@ class VentasProvider with ChangeNotifier{
 
   bool get botonRealizarGet=>_botonRelizar;
 
-
   Cliente? get clienteGet=> _clienteSeleccionado;
-   void deleteBotonRelizar(){
+
+  void deleteBotonRelizar(){
     _botonRelizar=false;
     notifyListeners();
   }
@@ -83,7 +80,4 @@ class VentasProvider with ChangeNotifier{
     _carritoVenta=false;
     notifyListeners();
   }
-
-
-
 }
