@@ -6,6 +6,7 @@ import 'package:lemonapp/providers/metodos_provider.dart';
 import 'package:lemonapp/providers/productos_provider.dart';
 import 'package:lemonapp/services/service_product.dart';
 import 'package:lemonapp/widgets/alertas_widget.dart';
+import 'package:lemonapp/widgets/retroceder.dart';
 import 'package:provider/provider.dart';
 
 class ProductCard extends StatefulWidget {
@@ -22,6 +23,7 @@ class _ProductCardState extends State<ProductCard> {
     Producto producto = widget.producto;
     String stringEstado=producto.estado==1?"Activo":"Inactivo";
     bool isMetodo=context.watch<MetodosProvider>().isMetodoExecuteGet;
+
 
     return ExpansionTile(
       trailing: Switch(
@@ -67,9 +69,9 @@ class _ProductCardState extends State<ProductCard> {
                       onTap: () {
                         if(producto.estado==1){
                           Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) =>  EditProduct(produtoSelect: producto,)),
-                        );
+                            context,
+                            SlidePageRoute(page: EditProduct(produtoSelect: producto,)),
+                          );
                         }
                       },
                       child: Container(
@@ -87,7 +89,9 @@ class _ProductCardState extends State<ProductCard> {
                     GestureDetector(
                       onTap: () {
                         if(producto.estado==1){
-                          _alertaEliminarProducto(context, producto);
+                          if(!isMetodo){
+                            _alertaEliminarProducto(context, producto);
+                          }
                         }
                       },
                       child: Container(
@@ -156,11 +160,10 @@ class _ProductCardState extends State<ProductCard> {
     ).then(
     (value) async {
       if(x==1){
-          context.read<MetodosProvider>().modalExecuting();
-
+        alertaCargando(context);
         await cambiarEstado(productoACambiar).then((response){
+          Navigator.pop(context);
           context.read<MetodosProvider>().metodoExecuted();
-          context.read<MetodosProvider>().modalExecuted();
 
           context.read<ProductosProvider>().updateProductList(productoACambiar);
           
@@ -215,8 +218,12 @@ void _alertaEliminarProducto(BuildContext context,Producto productoAEliminar) {
     },
   ).then((value) async{
     if(x==1){
+      alertaCargando(context);
       await eliminarProducto(productoAEliminar).then((response){
+        Navigator.pop(context);
+        context.read<MetodosProvider>().metodoExecuted();
         if(response){
+          
           context.read<ProductosProvider>().deleteProducttList(productoAEliminar.idProducto);
           alertFinal(context, true, 'Producto eliminado');
         }else{

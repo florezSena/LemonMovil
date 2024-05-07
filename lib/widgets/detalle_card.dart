@@ -4,8 +4,9 @@ import 'package:lemonapp/providers/ventas_provider.dart';
 import 'package:provider/provider.dart';
 
 class DetalleCard extends StatefulWidget {
-  const DetalleCard({super.key, required this.detalle});
+  const DetalleCard({super.key, required this.detalle, required this.mostrarDelete});
   final DetallesVenta detalle;
+  final bool mostrarDelete;
 
   @override
   State<DetalleCard> createState() => _DetalleCardState();
@@ -15,9 +16,10 @@ class _DetalleCardState extends State<DetalleCard> {
   @override
   Widget build(BuildContext context) {
     DetallesVenta detalle = widget.detalle;
+    bool isMostrarDelete=widget.mostrarDelete;
     return ExpansionTile(
       trailing: IconButton(
-        onPressed: (){
+        onPressed:isMostrarDelete? (){
           // showModalBottomSheet(
           //   context: context, 
           //   builder:(context) {
@@ -27,8 +29,8 @@ class _DetalleCardState extends State<DetalleCard> {
           //   },
           // );
           context.read<VentasProvider>().deleteProductCarrito(detalle);
-        },
-        icon: const Icon(Icons.delete,color: Colors.black,),
+        }:null,
+        icon:isMostrarDelete? const Icon(Icons.delete,color: Colors.black,): const SizedBox(),
       ),
       backgroundColor: Colors.transparent,
       tilePadding: const EdgeInsets.only(left: 0),

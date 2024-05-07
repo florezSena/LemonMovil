@@ -40,7 +40,7 @@ class _LayoutIndex extends State<LayoutIndex> {
         },
         currentIndex:_pageActual,
         items: const [
-          BottomNavigationBarItem(icon:Icon( Icons.shopping_bag),label: "Productos"),
+          BottomNavigationBarItem(icon:Icon( Icons.shopping_bag_outlined),label: "Productos"),
           BottomNavigationBarItem(icon:Icon( Icons.monetization_on),label: "Ventas")
         ],
       ),

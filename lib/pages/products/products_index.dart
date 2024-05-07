@@ -8,6 +8,7 @@ import 'package:lemonapp/providers/productos_provider.dart';
 import 'package:lemonapp/providers/metodos_provider.dart';
 import 'package:lemonapp/services/service_product.dart';
 import 'package:lemonapp/widgets/product_card.dart';
+import 'package:lemonapp/widgets/retroceder.dart';
 import 'package:provider/provider.dart';
 
 
@@ -62,7 +63,7 @@ class _PrdouctosIndexState extends State<PrdouctosIndex> {
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.shopping_basket),
+                      Icon(Icons.shopping_bag_outlined),
                       Padding(padding: EdgeInsets.only(left: 5)),
                       Flexible(
                         child: Text(
@@ -165,9 +166,9 @@ class _PrdouctosIndexState extends State<PrdouctosIndex> {
       floatingActionButton: FloatingActionButton(
         onPressed: (){
           Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const AddProduct()),
-          ).then((value) async{
+              context,
+              SlidePageRoute(page:const AddProduct()),
+            ).then((value) async{
             
             if(value!=null){
               await getProductos().then((productos){

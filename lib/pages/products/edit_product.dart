@@ -50,7 +50,7 @@ class _EditProduct extends State<EditProduct> {
                     child:const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.shopping_basket),
+                        Icon(Icons.shopping_bag_outlined),
                         Padding(padding: EdgeInsets.only(left: 5)),
                         Text(
                           "Editar Producto",
@@ -141,104 +141,111 @@ class _EditProduct extends State<EditProduct> {
                       ],
                     ),
                   ):const Text(""),
-                  const Spacer(),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () async{
-                        if (_formKey.currentState!.validate() && _isPosting==false) {
-      
-                          setState(() {
-                            _isPosting=true;
-                          });
-                          productSelect.nombre=nameController.text;
-                          productSelect.descripcion=descripcionController?.text;
-      
-      
-                          await duplicateNameUpdate(productSelect).then((nameDuplicated) async{
-                            if (nameDuplicated==true){
-                              setState(() {
-                                _isPosting=false;
-                              });
-                              if(_alertDuplicated==false){
-                                setState(() {
-                                  _alertDuplicated=true;
-                                });
-                                ScaffoldMessenger.of(context)
-                                .showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Este nombre ya esta registrado',style: TextStyle(color:Colors.white),),
-                                    duration: Duration(seconds: 3),
-                                    backgroundColor: Colors.black,
-                                  ),
-                                ).closed.then((_){
-                                  setState(() {
-                                    _alertDuplicated=false;
-                                  });
-                                });
-                              }
-                            }else{
-                              productSelect.descripcion=productSelect.descripcion==""?null:productSelect.descripcion;
-                              await putProduct(productSelect).then((respuesta){
-                                if(respuesta){
-                                  context.read<ProductosProvider>().updateProductList(productSelect);
-                                  ScaffoldMessenger.of(context)
-                                  .showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Producto actualizado',style: TextStyle(color:Colors.white),),
-                                      duration: Duration(seconds: 3),
-                                      backgroundColor: primaryColor,
-                                    ),
-                                  );
-                                  Navigator.pop(context,productSelect);
-                                }else{
-                                  setState(() {
-                                    _isPosting=false;
-                                  });
-                                  ScaffoldMessenger.of(context)
-                                  .showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Error al actualizar el producto',style: TextStyle(color:Colors.white),),
-                                      duration: Duration(seconds: 3),
-                                      backgroundColor: Colors.black,
-                                    ),
-                                  );
-                                }
-                              });
-                            }
-                          });
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryColor,
-                        shape:const RoundedRectangleBorder( // Configura los bordes
-                        borderRadius: BorderRadius.all(Radius.circular(5)), 
-                      ),
-                      ),
-                      child:const Text('Actualizar',style: TextStyle(color: Colors.white),)
-                    ),
-                  ),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () async{
-                        _isPosting==false?Navigator.pop(context):null;
-                      }, 
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        padding: const EdgeInsets.symmetric(vertical: 10.0), // Ajusta la altura
-                        shape:const RoundedRectangleBorder( // Configura los bordes
-                          borderRadius: BorderRadius.all(Radius.circular(5)), 
-                        ),
-                      ),
-                      child:const Text('Cancelar',style: TextStyle(color: Colors.white)),
-                    ),
-                  ),
                 ],
               ),
             )
           ),
-        )
+        ),
+        floatingActionButton: SizedBox(
+        width: MediaQuery.of(context).size.width * 0.9,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            ElevatedButton(
+              onPressed: () async{
+                if (_formKey.currentState!.validate() && _isPosting==false) {
+
+                  setState(() {
+                    _isPosting=true;
+                  });
+                  productSelect.nombre=nameController.text;
+                  productSelect.descripcion=descripcionController?.text;
+
+
+                  await duplicateNameUpdate(productSelect).then((nameDuplicated) async{
+                    if (nameDuplicated==true){
+                      setState(() {
+                        _isPosting=false;
+                      });
+                      if(_alertDuplicated==false){
+                        setState(() {
+                          _alertDuplicated=true;
+                        });
+                        ScaffoldMessenger.of(context)
+                        .showSnackBar(
+                          const SnackBar(
+                            content: Text('Este nombre ya esta registrado',style: TextStyle(color:Colors.white),),
+                            duration: Duration(seconds: 3),
+                            backgroundColor: Colors.black,
+                          ),
+                        ).closed.then((_){
+                          setState(() {
+                            _alertDuplicated=false;
+                          });
+                        });
+                      }
+                    }else{
+                      productSelect.descripcion=productSelect.descripcion==""?null:productSelect.descripcion;
+                      await putProduct(productSelect).then((respuesta){
+                        if(respuesta){
+                          context.read<ProductosProvider>().updateProductList(productSelect);
+                          ScaffoldMessenger.of(context)
+                          .showSnackBar(
+                            const SnackBar(
+                              content: Text('Producto actualizado',style: TextStyle(color:Colors.white),),
+                              duration: Duration(seconds: 3),
+                              backgroundColor: primaryColor,
+                            ),
+                          );
+                          Navigator.pop(context,productSelect);
+                        }else{
+                          setState(() {
+                            _isPosting=false;
+                          });
+                          ScaffoldMessenger.of(context)
+                          .showSnackBar(
+                            const SnackBar(
+                              content: Text('Error al actualizar el producto',style: TextStyle(color:Colors.white),),
+                              duration: Duration(seconds: 3),
+                              backgroundColor: Colors.black,
+                            ),
+                          );
+                        }
+                      });
+                    }
+                  });
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                minimumSize:const Size(double.infinity,45),
+                backgroundColor: primaryColor,
+                side: const BorderSide(color:primaryColor,width: 1),
+                shape:const RoundedRectangleBorder( // Configura los bordes
+                  borderRadius: BorderRadius.all(Radius.circular(5)), 
+                ),
+              ),
+              child:const Text('Actualizar',style: TextStyle(color: Colors.white),)
+            ),
+
+            const Padding(padding: EdgeInsets.only(top: 5)),
+
+            ElevatedButton(
+                onPressed: () async{
+                  _isPosting==false?Navigator.pop(context):null;
+                }, 
+                style: ElevatedButton.styleFrom(
+                  minimumSize:const Size(double.infinity,45),
+                  backgroundColor: Colors.black,
+                  side: const BorderSide(color:Colors.black,width: 1),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                ),
+              child:const Text('Cancelar',style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        ),
+      ),
       ),
     );
   }

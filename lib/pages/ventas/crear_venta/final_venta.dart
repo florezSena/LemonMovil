@@ -60,7 +60,7 @@ class FinalVenta extends StatelessWidget {
                         borderRadius: BorderRadius.circular(5),
                       ),
           
-                      child:DetalleCard(detalle: detalle,)
+                      child:DetalleCard(detalle: detalle,mostrarDelete: false,)
                       );
                     },
                   );

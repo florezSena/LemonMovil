@@ -52,7 +52,7 @@ class _CarritoVentaState extends State<CarritoVenta> {
                         borderRadius: BorderRadius.circular(5),
                       ),
           
-                      child:DetalleCard(detalle: detalle,)
+                      child:DetalleCard(detalle: detalle,mostrarDelete: true,)
                       );
                     },
                   );

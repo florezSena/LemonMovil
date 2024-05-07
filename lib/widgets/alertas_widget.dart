@@ -187,16 +187,25 @@ void alertaCargando(BuildContext context){
   showModalBottomSheet(
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
-
+    isDismissible: false,
     context: context, 
     builder:(context) {
-      return const AlertDialog(
-        title: Text("Cargando..."),
-        actions: [
-          Center(
-            child: CircularProgressIndicator(),
+      return PopScope(
+        canPop: false,
+        child: SingleChildScrollView(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).size.height * 0.50,
+            top: MediaQuery.of(context).size.height * 0.50,
           ),
-        ],
+          child:const AlertDialog(
+            title: Text("Cargando..."),
+            actions: [
+              Center(
+                child: CircularProgressIndicator(),
+              ),
+            ],
+          ),
+        ),
       );  
     },
   );

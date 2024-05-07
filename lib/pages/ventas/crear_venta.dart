@@ -89,12 +89,11 @@ class _CrearVentaState extends State<CrearVenta>with SingleTickerProviderStateMi
                     context.read<VentasProvider>().showBotonCliente();
                     if(value==1){
                       context.read<VentasProvider>().deleteBotonRelizar();
-                    }else if(value==2){
-                      context.read<VentasProvider>().showBotonRealizar();
                     }
                   }else if(value==0){
                     context.read<VentasProvider>().resetBotonCancelar();
                     context.read<VentasProvider>().deleteBotonCliente();
+                    context.read<VentasProvider>().deleteBotonRelizar();
                   }
                   if(isCarrito==false){
                     alertaValidacionDeVista(context,"No tienes productos agregados","Debes agregar almenos un producto para continuar con el registro de la venta");
@@ -102,6 +101,9 @@ class _CrearVentaState extends State<CrearVenta>with SingleTickerProviderStateMi
                   }else if(isCliente==false && value==2){
                     alertaValidacionDeVista(context,"No elegiste el cliente","Debes elegir un cliente continuar con el registro de la venta");
                     _tabController.index=1;
+                  }else if(isCliente==true && value==2){
+                    context.read<VentasProvider>().showBotonRealizar();
+                    context.read<VentasProvider>().deleteBotonCliente();
                   }
                 },
               ),
@@ -180,18 +182,17 @@ class _CrearVentaState extends State<CrearVenta>with SingleTickerProviderStateMi
                       alertaValidacionDeVista(context,"No elegiste el cliente","Debes elegir un cliente continuar con el registro de la venta");
                     }else if(_tabController.index==2){
                       alertaRealizarVenta(context).then((value) async{
-                        alertaCargando(context);
                         if(value==true){
+                          alertaCargando(context);
                           await realizarVenta(detallesVenta, clienteVenta).then((value){
                             Navigator.pop(context);
                             if(value){
-                              alertFinal(context, true, "Venta realizada con exito").then((value){
+                                alertFinal(context, true, "Venta realizada con exito").then((value){
                                 context.read<VentasProvider>().resetBotonCancelar();
                                 context.read<VentasProvider>().deleteBotonCliente();
                                 context.read<VentasProvider>().deleteBotonRelizar();
                                 context.read<VentasProvider>().deleteAllProductCarrito();
                                 context.read<VentasProvider>().deleteCliente();
-
                                 
                                 ventaCancelada=true;
                                 Navigator.pop(context);

@@ -109,7 +109,7 @@ Future<bool>  postProductos(String name,String? descripcion) async {
     1,
   );
   // Convertir el objeto a JSON
-  String productoJson = jsonEncode(producto);
+  String productoJson = jsonEncode(producto.productoToJson());
   final Uri url = Uri.parse("$httpUrl/Productos/InsertProduct");
   final response = await http.post(
     url,

@@ -27,7 +27,7 @@ void modalAddProduct(BuildContext context,Producto producto)  {
                 child:const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.shopping_basket),
+                    Icon(Icons.shopping_bag_outlined),
                     Padding(padding: EdgeInsets.only(left: 5)),
                     Text(
                       "Agregando un producto",
