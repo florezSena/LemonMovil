@@ -166,11 +166,15 @@ class _CrearVentaState extends State<CrearVenta>with SingleTickerProviderStateMi
                 const Padding(padding: EdgeInsets.only(top: 5)),
 
                 ElevatedButton(
-                  onPressed: (){
+                  onPressed: () async{
                     if(_tabController.index==0 && isCarrito){
                       context.read<VentasProvider>().deleteBotonCancelar();
                       context.read<VentasProvider>().showBotonCliente();
+                      await getClientePordefecto().then((value) {
+                        context.read<VentasProvider>().addCliente(value);
+                      });
                       _tabController.index=1;
+
                     }else if(_tabController.index==1 && isCliente){
                       _tabController.index=2;
                       context.read<VentasProvider>().showBotonRealizar();

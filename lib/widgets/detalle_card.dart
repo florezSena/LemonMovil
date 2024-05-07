@@ -17,6 +17,10 @@ class _DetalleCardState extends State<DetalleCard> {
   Widget build(BuildContext context) {
     DetallesVenta detalle = widget.detalle;
     bool isMostrarDelete=widget.mostrarDelete;
+    String precioFormateado = detalle.precioKilo.toStringAsFixed(2).replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match match) => '${match[1]}.');
+    String subtotalFormateado = detalle.subtotal.toStringAsFixed(2).replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match match) => '${match[1]}.');
+
+    
     return ExpansionTile(
       trailing: IconButton(
         onPressed:isMostrarDelete? (){
@@ -47,7 +51,7 @@ class _DetalleCardState extends State<DetalleCard> {
           contentPadding:const EdgeInsets.all(0),
           subtitle: SizedBox(
             width: MediaQuery.of(context).size.width * 0.6,
-            child: Text('#Producto: ${detalle.idProducto}\n(Kg) a vender: ${detalle.cantidad}\nCosto (kg): \$${detalle.precioKilo}\nSubtotal: \$${detalle.subtotal}')
+            child: Text('(Kg) a vender: ${detalle.cantidad}\nCosto (kg): \$$precioFormateado\nSubtotal: \$$subtotalFormateado')
           ),
         ),
       ],

@@ -20,6 +20,8 @@ class _ProductVentaCardState extends State<ProductVentaCard> {
     List<int> idsDetalles = detalles.map((detalle) => detalle.idProducto).toList();
     Producto producto = widget.producto;
     String stringEstado=producto.estado==1?"Activo":"Inactivo";
+    String precioFormateado= producto.costo.toStringAsFixed(2).replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match match) => '${match[1]}.');
+
     return ExpansionTile(
       trailing: Container(
         padding:const EdgeInsets.all(1),
@@ -53,7 +55,7 @@ class _ProductVentaCardState extends State<ProductVentaCard> {
       children: [
         ListTile(
           contentPadding:const EdgeInsets.all(0),
-          subtitle: SizedBox(width: MediaQuery.of(context).size.width * 0.6,child: Text('#Producto: ${producto.idProducto}\nCantidad: ${producto.cantidad}\nCosto: ${producto.costo}\nDescripcion: ${producto.descripcion=="null"?"sin descripcion":producto.descripcion}\nEstado: $stringEstado',softWrap: true,)),
+          subtitle: SizedBox(width: MediaQuery.of(context).size.width * 0.6,child: Text('#Producto: ${producto.idProducto}\nCantidad: ${producto.cantidad}\nCosto: \$$precioFormateado\nDescripción: ${producto.descripcion=="null"?"sin descripcion":producto.descripcion}\nEstado: $stringEstado',softWrap: true,)),
         ),
       ],
     );

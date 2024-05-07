@@ -1,15 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:lemonapp/models/detalles_venta.dart';
 import 'package:lemonapp/models/venta.dart';
 import 'package:lemonapp/pages/layout/layout_componentes.dart';
 import 'package:lemonapp/services/service_venta.dart';
+import 'package:lemonapp/widgets/alertas_widget.dart';
 
-class VisualizarVenta extends StatelessWidget {
+class VisualizarVenta extends StatefulWidget {
   const VisualizarVenta({super.key, required this.venta});
   final Venta venta;
+
+  @override
+  State<VisualizarVenta> createState() => _VisualizarVentaState();
+}
+
+class _VisualizarVentaState extends State<VisualizarVenta> {
   @override
   Widget build(BuildContext context) {
-    Future <List<DetallesVenta>> detallesVenta=getDetalleVentas(venta.idVenta);
+    String totalFormateado = widget.venta.total.toStringAsFixed(2).replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match match) => '${match[1]}.');
+
+    Future <List<DetallesVenta>> detallesVenta=getDetalleVentas(widget.venta.idVenta);
     return Scaffold(
       appBar: const CustomAppBar(),
       body: Center(
@@ -47,7 +57,8 @@ class VisualizarVenta extends StatelessWidget {
                   borderRadius: BorderRadius.circular(5),
                 ),
                 child: ListTile(
-                  title: Text("Fecha ${venta.fecha}\nTotal: \$${venta.total}\nEstado: ${venta.estado==1?"Realizada":"Anulada"}\nCliente: ${venta.idClienteNavigation.nombreRazonSocial}\n#Cliente: ${venta.idClienteNavigation.documento}"),
+                  title: Text("Fecha ${DateFormat('dd/MM/yyyy\nhh:mm a').format(widget.venta.fecha)}\nCliente: ${widget.venta.idClienteNavigation.nombreRazonSocial}\nIdentificación: ${widget.venta.idClienteNavigation.documento}\nEstado: ${widget.venta.estado==1?"Realizada":"Anulada"}"),
+                  subtitle: Text("Total: \$$totalFormateado", style: const TextStyle(color: Colors.black, fontSize: 20),),
                 ),
               ),
               Container(
@@ -77,6 +88,10 @@ class VisualizarVenta extends StatelessWidget {
                         itemCount: detallesVenta.length,
                         itemBuilder: (context, index) {
                           DetallesVenta detalleVenta = detallesVenta[index];
+                          String subtotalFormateado = detalleVenta.subtotal.toStringAsFixed(2).replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match match) => '${match[1]}.');
+                          String precioFormateado = detalleVenta.precioKilo.toStringAsFixed(2).replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match match) => '${match[1]}.');
+
+
                           return Container(
                             margin: index == detallesVenta.length - 1 
                             ? const EdgeInsets.only(bottom: 130.0,top:20)
@@ -92,8 +107,8 @@ class VisualizarVenta extends StatelessWidget {
                             ),
         
                             child: ListTile(
-                              title: Text("Subtotal: \$${detalleVenta.subtotal}"),
-                              subtitle: Text("#Producto:${detalleVenta.idProducto}\nProducto: ${detalleVenta.idProductoNavigation.nombre}\n(Kg) vendidos: ${detalleVenta.cantidad}\nPrecio (Kg): \$${detalleVenta.precioKilo}"),
+                              title: Text("Producto: ${detalleVenta.idProductoNavigation.nombre}"),
+                              subtitle: Text("(Kg) vendidos: ${detalleVenta.cantidad}\nPrecio (Kg): \$$precioFormateado\nSubtotal: \$$subtotalFormateado"),
                             )
                           );
                         },
@@ -106,13 +121,55 @@ class VisualizarVenta extends StatelessWidget {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: primaryColor,
-        onPressed: (){
-          Navigator.pop(context);
-        },
-        foregroundColor: Colors.white,
-        child:const Icon(Icons.arrow_back),
+      floatingActionButton: SizedBox(
+        width: MediaQuery.of(context).size.width * 0.9,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            TextButton(
+              onPressed: () {
+                if(widget.venta.estado==1){
+                  alertaAnularVenta(context,widget.venta).then((value){
+                    if(value){
+                      setState(() {
+                        widget.venta.estado=0;
+                        //Implementar para que al devolver aparezca anulada
+                      });
+                    }
+                  });
+                }
+              },
+              style: ButtonStyle(
+                minimumSize: MaterialStateProperty.all<Size>(const Size(75, 48)),
+                backgroundColor: MaterialStateProperty.all<Color>(widget.venta.estado==1?primaryColor:Colors.grey.shade600), // Color de fondo
+                side: MaterialStateProperty.all<BorderSide>(BorderSide(color:widget.venta.estado==1?primaryColor: Colors.grey.shade600)), // Borde negro
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5), // Radio del borde
+                  ),
+                ),
+              ),
+              child: Text(
+                widget.venta.estado == 1 ? "Anular" : "Anulada",
+                style:const TextStyle(color:Colors.white), // Color del texto
+              ),
+            ),
+            IconButton(
+              onPressed: (){
+                Navigator.pop(context);
+              },
+              icon:Container(
+                padding:const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color:widget.venta.estado==1?primaryColor:Colors.grey.shade600,
+                  borderRadius: BorderRadius.circular(10),
+                  border:widget.venta.estado==1?Border.all(color:Colors.transparent,width: 2): Border.all(color:Colors.grey.shade600,width: 2)
+                ),
+                child: const Icon(Icons.arrow_back,size: 30, color: Colors.white,)
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -374,3 +374,30 @@ Future<List<Venta>> getVentasQuery(String query) async {
     throw Exception("Error de catch: $error");
   }
 }
+
+
+Future<Cliente> getClientePordefecto() async {
+  Cliente cliente;
+  final Uri url = Uri.parse("$httpUrl/Clientes/GetClientById?id=1");
+  try{
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+    if(response.statusCode==200){
+      String body = utf8.decode(response.bodyBytes);
+      final jsonData=jsonDecode(body);
+      cliente=Cliente.clienteFromJson(jsonData);
+      return cliente;
+    }else if(response.statusCode==403){
+      //Salir del aplicativo
+      throw Exception("Sin permisos");
+    }else{
+      throw Exception("Error en la peticion ${response.statusCode}");
+    }
+  }catch(error){
+    throw Exception("Error de catch: $error");
+  }
+}

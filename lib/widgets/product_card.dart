@@ -24,6 +24,7 @@ class _ProductCardState extends State<ProductCard> {
     String stringEstado=producto.estado==1?"Activo":"Inactivo";
     bool isMetodo=context.watch<MetodosProvider>().isMetodoExecuteGet;
 
+    String precioFormateado= producto.costo.toStringAsFixed(2).replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match match) => '${match[1]}.');
 
     return ExpansionTile(
       trailing: Switch(
@@ -59,7 +60,7 @@ class _ProductCardState extends State<ProductCard> {
 
             children: [
               
-              Flexible(child: SizedBox(width: MediaQuery.of(context).size.width * 0.6,child: Text('#Producto: ${producto.idProducto}\nCantidad: ${producto.cantidad}\nCosto: ${producto.costo}\nDescripcion: ${producto.descripcion=="null"?"sin descripcion":producto.descripcion}\nEstado: $stringEstado',softWrap: true,))),
+              Flexible(child: SizedBox(width: MediaQuery.of(context).size.width * 0.6,child: Text('#Producto: ${producto.idProducto}\nCantidad: ${producto.cantidad}\nCosto: \$$precioFormateado\nDescripción: ${producto.descripcion=="null"?"sin descripción":producto.descripcion}\nEstado: $stringEstado',softWrap: true,))),
               Padding(
                 padding: const EdgeInsets.only(right: 9),
                 child: Column(
