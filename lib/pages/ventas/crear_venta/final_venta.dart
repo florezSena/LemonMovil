@@ -33,39 +33,35 @@ class FinalVenta extends StatelessWidget {
                 )
               ),
               const Padding(padding: EdgeInsets.only(top: 10)),
-              const Text("Ciente:", style: TextStyle(fontSize: 18),),
               TextFormField(
                 textAlign: TextAlign.center,
                 enabled: false,
                 decoration: InputDecoration(
                   hintStyle:const TextStyle(color: Colors.black),
-                  hintText: cliente==null?"":cliente!.nombreRazonSocial
-                ),
-              ),
-              const Padding(padding: EdgeInsets.only(top: 10)),
-              const Text("Total:", style: TextStyle(fontSize: 18),),
-              TextFormField(
-                textAlign: TextAlign.center,
-                enabled: false,
-                decoration: InputDecoration(
-                  hintStyle:const TextStyle(color: Colors.black),
-                  hintText: "\$$total"
-                ),
-              ),
-              const Padding(padding: EdgeInsets.only(top: 10)),
-              const Text("Fecha:", style: TextStyle(fontSize: 18),),
-              TextFormField(
-                textAlign: TextAlign.center,
-                enabled: false,
-                decoration: InputDecoration(
-                  hintStyle:const TextStyle(color: Colors.black),
-                  hintText:DateFormat('dd/MM/yyyy hh:mm a').format(DateTime.now())
+                  hintText:"Fecha: ${DateFormat('dd/MM/yyyy hh:mm a').format(DateTime.now())}"
 
                 ),
               ),
-              
               const Padding(padding: EdgeInsets.only(top: 10)),
-              const Text("Detalles:", style: TextStyle(fontSize: 18),),
+              TextFormField(
+                textAlign: TextAlign.center,
+                enabled: false,
+                decoration: InputDecoration(
+                  hintStyle:const TextStyle(color: Colors.black),
+                  hintText: "Cliente: ${cliente==null?"":cliente!.nombreRazonSocial}"
+                ),
+              ),
+              const Padding(padding: EdgeInsets.only(top: 10)),
+              TextFormField(
+                textAlign: TextAlign.center,
+                enabled: false,
+                decoration: InputDecoration(
+                  hintStyle:const TextStyle(color: Colors.black),
+                  hintText: "Total: \$$total"
+                ),
+              ),
+              const Padding(padding: EdgeInsets.only(top: 10)),
+              const Text("Detalles de la venta:", style: TextStyle(fontSize: 18),),
               Expanded(
                 child: Builder(builder:(context) {
                   return ListView.builder(

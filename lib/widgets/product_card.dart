@@ -232,7 +232,7 @@ void _alertaEliminarProducto(BuildContext context,Producto productoAEliminar) {
           context.read<ProductosProvider>().deleteProducttList(productoAEliminar.idProducto);
           alertFinal(context, true, 'Producto eliminado');
         }else{
-          alertFinal(context, false, 'Este producto esta asociado');
+          alertFinal(context, false, 'Este producto no se puede eliminar');
         }
       });
     }
