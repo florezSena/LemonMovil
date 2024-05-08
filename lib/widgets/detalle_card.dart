@@ -35,7 +35,7 @@ class _DetalleCardState extends State<DetalleCard> {
           context.read<VentasProvider>().deleteProductCarrito(detalle);
         },
         icon: const Icon(Icons.delete,color: Colors.black,),
-      ):Text("Subtotal: $subtotalFormateado",style: TextStyle(fontSize: 15),),
+      ):Text("Subtotal: \$$subtotalFormateado",style:const TextStyle(fontSize: 15),),
       backgroundColor: Colors.transparent,
       tilePadding: const EdgeInsets.only(left: 0),
       title: Text(detalle.idProductoNavigation.nombre),

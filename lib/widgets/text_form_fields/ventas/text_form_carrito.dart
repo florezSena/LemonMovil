@@ -105,6 +105,8 @@ Widget textFormPrecio(TextEditingController textEditinPrecio,Producto producto) 
         return "Cantidad invalida";
       }else if(double.parse(value)<producto.costo){
         return("El precio no puede ser menor al precio inicial: \$${producto.costo}");
+      }else if(double.parse(value)<100){
+        return("El precio no puede ser menor a \$100");
       } else {
         return null;
       }

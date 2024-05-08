@@ -265,7 +265,7 @@ Future<bool> alertaAnularVenta(BuildContext context,Venta ventaAAnular) async{
         }
       });
     }else{
-      completer.complete(true);
+      completer.complete(false);
     }
   });
   return completer.future;

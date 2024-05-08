@@ -83,15 +83,19 @@ class _CrearVentaState extends State<CrearVenta>with SingleTickerProviderStateMi
                   Tab(icon: Icon(Icons.person),),
                   Tab(icon: Icon(Icons.monetization_on_outlined),),
                 ],
-                onTap: (value) async{
+                onTap: (value){
                   if(value!=0 && isCarrito==true){
                     context.read<VentasProvider>().deleteBotonCancelar();
                     context.read<VentasProvider>().showBotonCliente();
-                    alertaCargando(context);
-                    await getClientePordefecto().then((value) {
-                      Navigator.pop(context);
-                      context.read<VentasProvider>().addCliente(value);
-                    });
+                    if(!isCliente){
+                      alertaCargando(context);
+                      () async {
+                        await getClientePordefecto().then((value) {
+                          Navigator.pop(context);
+                          context.read<VentasProvider>().addCliente(value);
+                        });
+                      }();
+                    }
                     if(value==1){
                       context.read<VentasProvider>().deleteBotonRelizar();
                     }
@@ -175,11 +179,13 @@ class _CrearVentaState extends State<CrearVenta>with SingleTickerProviderStateMi
                     if(_tabController.index==0 && isCarrito){
                       context.read<VentasProvider>().deleteBotonCancelar();
                       context.read<VentasProvider>().showBotonCliente();
-                      alertaCargando(context);
-                      await getClientePordefecto().then((value) {
-                        Navigator.pop(context);
-                        context.read<VentasProvider>().addCliente(value);
-                      });
+                      if(!isCliente){
+                        alertaCargando(context);
+                        await getClientePordefecto().then((value) {
+                          Navigator.pop(context);
+                          context.read<VentasProvider>().addCliente(value);
+                        });
+                      }
                       _tabController.index=1;
 
                     }else if(_tabController.index==1 && isCliente){
