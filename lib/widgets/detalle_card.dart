@@ -22,8 +22,8 @@ class _DetalleCardState extends State<DetalleCard> {
 
     
     return ExpansionTile(
-      trailing: IconButton(
-        onPressed:isMostrarDelete? (){
+      trailing:isMostrarDelete? IconButton(
+        onPressed:(){
           // showModalBottomSheet(
           //   context: context, 
           //   builder:(context) {
@@ -33,9 +33,9 @@ class _DetalleCardState extends State<DetalleCard> {
           //   },
           // );
           context.read<VentasProvider>().deleteProductCarrito(detalle);
-        }:null,
-        icon:isMostrarDelete? const Icon(Icons.delete,color: Colors.black,): const SizedBox(),
-      ),
+        },
+        icon: const Icon(Icons.delete,color: Colors.black,),
+      ):Text("Subtotal: $subtotalFormateado",style: TextStyle(fontSize: 15),),
       backgroundColor: Colors.transparent,
       tilePadding: const EdgeInsets.only(left: 0),
       title: Text(detalle.idProductoNavigation.nombre),

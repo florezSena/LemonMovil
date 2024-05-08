@@ -15,6 +15,7 @@ class VisualizarVenta extends StatefulWidget {
 }
 
 class _VisualizarVentaState extends State<VisualizarVenta> {
+  bool isChanged=false;
   @override
   Widget build(BuildContext context) {
     String totalFormateado = widget.venta.total.toStringAsFixed(2).replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match match) => '${match[1]}.');
@@ -133,6 +134,7 @@ class _VisualizarVentaState extends State<VisualizarVenta> {
                     if(value){
                       setState(() {
                         widget.venta.estado=0;
+                        isChanged=true;
                         //Implementar para que al devolver aparezca anulada
                       });
                     }
@@ -156,7 +158,7 @@ class _VisualizarVentaState extends State<VisualizarVenta> {
             ),
             IconButton(
               onPressed: (){
-                Navigator.pop(context);
+                Navigator.pop(context,isChanged);
               },
               icon:Container(
                 padding:const EdgeInsets.all(10),

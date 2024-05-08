@@ -25,7 +25,13 @@ class _VentaCardCardState extends State<VentaCard> {
           Navigator.push(
             context,
             SlidePageRoute(page: VisualizarVenta(venta: venta)),
-          );
+          ).then((value){
+            if(value){
+              setState(() {
+                venta.estado=0;
+              });
+            }
+          });
         },
         child: Container(
           padding:const EdgeInsets.only(top: 1,bottom: 1,left: 20,right: 20),

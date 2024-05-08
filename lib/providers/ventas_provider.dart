@@ -8,6 +8,7 @@ class VentasProvider with ChangeNotifier{
   bool _botonCancelar = true;
   bool _botonCliente = false;
   bool _botonRelizar = false;
+  double _totalVenta=0;
 
   List<DetallesVenta> productosAVender=[];
   Cliente? _clienteSeleccionado;
@@ -21,6 +22,9 @@ class VentasProvider with ChangeNotifier{
   bool get botonClienteGet=>_botonCliente;
 
   bool get botonRealizarGet=>_botonRelizar;
+
+  double get totalVentaGet=>_totalVenta;
+
 
   Cliente? get clienteGet=> _clienteSeleccionado;
 
@@ -65,19 +69,24 @@ class VentasProvider with ChangeNotifier{
   void addProductCarrito(DetallesVenta producto){
     productosAVender.add(producto);
     _carritoVenta=true;
+    _totalVenta+=producto.subtotal;
     notifyListeners();
   }
   
   void deleteProductCarrito(DetallesVenta producto){
     productosAVender.remove(producto);
+    _totalVenta-=producto.subtotal;
+
     if(productosAVender.isEmpty){
       _carritoVenta=false;
+      _totalVenta=0;
     }
     notifyListeners();
   }
   void deleteAllProductCarrito(){
     productosAVender.clear();
     _carritoVenta=false;
+    _totalVenta=0;
     notifyListeners();
   }
 }

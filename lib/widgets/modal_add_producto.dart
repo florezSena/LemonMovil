@@ -78,7 +78,7 @@ void modalAddProduct(BuildContext context,Producto producto)  {
                         borderRadius: BorderRadius.all(Radius.circular(5)), 
                       ),
                       ),
-                      child:const Text('Guardar',style: TextStyle(color: Colors.white),)
+                      child:const Text('Agregar',style: TextStyle(color: Colors.white),)
                     ),
                     const Padding(padding: EdgeInsetsDirectional.only(bottom: 20)),
                     ElevatedButton(

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:lemonapp/models/cliente.dart';
 import 'package:lemonapp/models/detalles_venta.dart';
+import 'package:lemonapp/providers/ventas_provider.dart';
 import 'package:lemonapp/widgets/detalle_card.dart';
+import 'package:provider/provider.dart';
 
 class FinalVenta extends StatelessWidget {
   const FinalVenta({super.key, required this.detallesVenta, required this.cliente});
@@ -9,6 +12,7 @@ class FinalVenta extends StatelessWidget {
   final Cliente? cliente;
   @override
   Widget build(BuildContext context){
+    String total=context.watch<VentasProvider>().totalVentaGet.toStringAsFixed(2).replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match match) => '${match[1]}.');
     return Scaffold(
       body: Align(
         alignment: Alignment.topCenter,
@@ -39,6 +43,28 @@ class FinalVenta extends StatelessWidget {
                 ),
               ),
               const Padding(padding: EdgeInsets.only(top: 10)),
+              const Text("Total:", style: TextStyle(fontSize: 18),),
+              TextFormField(
+                textAlign: TextAlign.center,
+                enabled: false,
+                decoration: InputDecoration(
+                  hintStyle:const TextStyle(color: Colors.black),
+                  hintText: "\$$total"
+                ),
+              ),
+              const Padding(padding: EdgeInsets.only(top: 10)),
+              const Text("Fecha:", style: TextStyle(fontSize: 18),),
+              TextFormField(
+                textAlign: TextAlign.center,
+                enabled: false,
+                decoration: InputDecoration(
+                  hintStyle:const TextStyle(color: Colors.black),
+                  hintText:DateFormat('dd/MM/yyyy hh:mm a').format(DateTime.now())
+
+                ),
+              ),
+              
+              const Padding(padding: EdgeInsets.only(top: 10)),
               const Text("Detalles:", style: TextStyle(fontSize: 18),),
               Expanded(
                 child: Builder(builder:(context) {
@@ -47,9 +73,7 @@ class FinalVenta extends StatelessWidget {
                     itemBuilder: (BuildContext context, int index) {
                       DetallesVenta detalle = detallesVenta[index];
                       return Container(
-                      margin: index == detallesVenta.length - 1 
-                      ? const EdgeInsets.only(bottom: 200.0,top:20)
-                      : const EdgeInsets.only(top: 20),
+                      margin: const EdgeInsets.only(top: 20),
                       padding:const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         border: Border.all(
