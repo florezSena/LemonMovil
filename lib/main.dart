@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lemonapp/pages/layout/layout_componentes.dart';
 import 'package:lemonapp/pages/layout/layout_index.dart';
+import 'package:lemonapp/pages/login/login_index.dart';
 import 'package:lemonapp/providers/productos_provider.dart';
 import 'package:lemonapp/providers/metodos_provider.dart';
 import 'package:lemonapp/providers/ventas_provider.dart';
@@ -25,7 +26,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return   MaterialApp(
       routes: {
-        '/':(context) =>const LayoutIndex()
+        '/':(context) =>const LoginIndex()
       },
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: primaryColor),
