@@ -6,6 +6,7 @@ import 'package:lemonapp/services/config.dart';
 
 
 Future<List<Producto>> getProductos() async {
+  final token= await obtenerToken("Token");
   List<Producto> productos=[];
 
   final Uri url = Uri.parse("$httpUrl/Productos/GetProduct");

@@ -1,6 +1,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lemonapp/services/config.dart';
+import 'package:lemonapp/widgets/alertas_widget.dart';
 
 const Color primaryColor = Color(0xFF077336);
 
@@ -22,6 +24,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         IconButton(
           icon:const Icon(Icons.logout, color: Colors.white,),
           onPressed: (){
+            alertaCerrarSesion(context).then((value){
+              if(value){
+                deleteToken("Token").then((value){
+                    print("se elimino con exito el token");
+                });
+              }
+            });
           },
         ),
       ],

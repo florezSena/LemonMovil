@@ -271,3 +271,49 @@ Future<bool> alertaAnularVenta(BuildContext context,Venta ventaAAnular) async{
   return completer.future;
 }
 
+
+Future<bool> alertaCerrarSesion(BuildContext context) async{
+  Completer<bool> completer = Completer<bool>();
+  int x=0;
+  showModalBottomSheet(
+    backgroundColor: Colors.transparent,
+    isScrollControlled: true,
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('¿Estas seguro de cerrar sesion?'),
+        actions: [
+          TextButton(
+            style:const ButtonStyle(
+              shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5)))),
+              backgroundColor: MaterialStatePropertyAll(Colors.black)
+            ),
+            child: const Text('Cancelar', style: TextStyle(color: Colors.white),),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          TextButton(
+            style:const ButtonStyle(
+              shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5)))),
+              backgroundColor: MaterialStatePropertyAll(primaryColor)
+            ),
+            child: const Text('Aceptar', style: TextStyle(color: Colors.white),),
+            onPressed: () async{
+              x=1;
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      );
+    },
+  ).then((value){
+    if(x==1){
+      completer.complete(true);  
+    }else{
+      completer.complete(false);
+    }
+  });
+  return completer.future;
+}
+
