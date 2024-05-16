@@ -144,13 +144,13 @@ class _LoginIndex extends State<LoginIndex> {
                               login(usuarioController.text, passwordController.text).then((value) {
                                 _isPosting=false;
                                 Navigator.pop(context);
-                                if(value){
+                                if(value=="Exito"){
                                   Navigator.pushReplacement(
                                     context,
                                     SlidePageRoute(page:const LayoutIndex()),
                                   );
                                 }else{
-                                  alertFinal(context, false, "Usuario no encontrado");
+                                  alertasLogin(context, false, value);
                                 }
                               });
                             }
@@ -158,7 +158,7 @@ class _LoginIndex extends State<LoginIndex> {
                           child: const Text("Ingresar", style: TextStyle(color: Colors.white),)
                         ),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             GestureDetector(
                               onTap: (){
@@ -167,7 +167,7 @@ class _LoginIndex extends State<LoginIndex> {
                               child: Container(
                                 padding: const EdgeInsets.only(top: 15),
                                 decoration: const BoxDecoration(
-                                  border: Border(bottom: BorderSide(color: Colors.black, width: 2)),
+                                  border: Border(bottom: BorderSide(color: Colors.black, width: 1)),
                                 ),
                                 child: const Text("¿Olvidaste tu contraseña?",style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),)
                               )

@@ -6,7 +6,6 @@ import 'package:lemonapp/services/config.dart';
 
 
 Future<List<Producto>> getProductos() async {
-  final token= await obtenerToken("Token");
   List<Producto> productos=[];
 
   final Uri url = Uri.parse("$httpUrl/Productos/GetProduct");
@@ -14,11 +13,12 @@ Future<List<Producto>> getProductos() async {
     final response = await http.get(
       url,
       headers: {
-        'Authorization': 'Bearer $token',
+        'Authorization': 'Bearer ${await obtenerToken("Token")}',
       },
     );
 
     if(response.statusCode==200){
+
       String body = utf8.decode(response.bodyBytes);
 
       final jsonData=jsonDecode(body);
@@ -36,7 +36,6 @@ Future<List<Producto>> getProductos() async {
           )
         );
       }
-      
       return productos;
     }else if(response.statusCode==403){
       //Salir del aplicativo
@@ -46,7 +45,7 @@ Future<List<Producto>> getProductos() async {
       throw Exception("Error en la peticion ${response.statusCode}");
     }
   }catch(error){
-    throw Exception("Error de catch: $error");
+    throw Exception(error);
   }
 }
 
@@ -58,7 +57,7 @@ Future<bool>  eliminarProducto(Producto productoAEliminar) async {
     final response = await http.delete(
       url,
       headers: {
-        'Authorization': 'Bearer $token',
+        'Authorization': 'Bearer ${await obtenerToken("Token")}',
         'Content-Type': 'application/json'
       },
     );
@@ -83,7 +82,7 @@ Future<bool>  cambiarEstado(Producto productoACambiar) async {
     final response = await http.put(
       url,
       headers: {
-        'Authorization': 'Bearer $token',
+        'Authorization': 'Bearer ${await obtenerToken("Token")}',
         'Content-Type': 'application/json'
       },
       body: productoJson,
@@ -115,7 +114,7 @@ Future<bool>  postProductos(String name,String? descripcion) async {
   final response = await http.post(
     url,
     headers: {
-      'Authorization': 'Bearer $token',
+      'Authorization': 'Bearer ${await obtenerToken("Token")}',
       'Content-Type': 'application/json'
     },
     body: productoJson,
@@ -136,7 +135,7 @@ Future<bool>  putProduct(Producto productoEdit) async {
   final response = await http.put(
     url,
     headers: {
-      'Authorization': 'Bearer $token',
+      'Authorization': 'Bearer ${await obtenerToken("Token")}',
       'Content-Type': 'application/json'
     },
     body: productoJson
@@ -157,7 +156,7 @@ Future <bool> duplicateName(String name) async {
   final response = await http.get(
     url,
     headers: {
-      'Authorization': 'Bearer $token',
+      'Authorization': 'Bearer ${await obtenerToken("Token")}',
     },
   );
   bool duplicated=false;
@@ -188,7 +187,7 @@ Future <bool> duplicateNameUpdate(Producto product) async {
   final response = await http.get(
     url,
     headers: {
-      'Authorization': 'Bearer $token',
+      'Authorization': 'Bearer ${await obtenerToken("Token")}',
     },
   );
   bool duplicated=false;

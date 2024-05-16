@@ -171,9 +171,9 @@ class _ProductCardState extends State<ProductCard> {
           context.read<ProductosProvider>().updateProductList(productoACambiar);
           
           if(response){
-            return alertFinal(context, response, "Estado cambiado");
+            return alertFinal(context, response, "Estado actualizado");
           }else{
-            return alertFinal(context, response, "Estado no se cambio");
+            return alertFinal(context, response, "Estado no actualizado");
           }
           
         });

@@ -2,9 +2,6 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-
-
-String token ="";
 String httpUrl="http://florezsena-001-site1.ltempurl.com/api";
 
 Future<void> guardarToken(String clave, String valor) async {
@@ -20,7 +17,7 @@ Future<void> deleteToken(String clave) async {
   final storage = FlutterSecureStorage();
   await storage.delete(key: clave);
 }
-Future<bool>  login(String usuarioString,String passwordString) async {
+Future<String>  login(String usuarioString,String passwordString) async {
   final Uri url = Uri.parse("$httpUrl/Accesos/Login");
   final response = await http.post(
     url,
@@ -38,11 +35,10 @@ Future<bool>  login(String usuarioString,String passwordString) async {
     if(jsonData['success']){
       String tokenString=jsonData["result"];
       guardarToken("Token", tokenString);
-      return true;
+      return "Exito";
     }
-    print("no encontrado");
-    return false;
+    return "${jsonData["message"]}";
   }else{
-    return false;
+    return "Error";
   }
 }

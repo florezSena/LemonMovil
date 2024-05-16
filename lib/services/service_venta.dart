@@ -15,7 +15,7 @@ Future<List<Venta>> getVentas() async {
     final response = await http.get(
       url,
       headers: {
-        'Authorization': 'Bearer $token',
+        'Authorization': 'Bearer ${await obtenerToken("Token")}',
       },
     );
 
@@ -59,7 +59,7 @@ Future<List<DetallesVenta>> getDetalleVentas(int idVenta) async {
     final response = await http.get(
       url,
       headers: {
-        'Authorization': 'Bearer $token',
+        'Authorization': 'Bearer ${await obtenerToken("Token")}',
       },
     );
 
@@ -102,7 +102,7 @@ Future<bool>  anularVenta(Venta ventaAAnular) async {
     final responseDetalleVenta = await http.get(
       urlDetallesVenta,
       headers: {
-        'Authorization': 'Bearer $token',
+        'Authorization': 'Bearer ${await obtenerToken("Token")}',
       },
     );
     //Si la respuesta no es 200 hubo un error
@@ -119,7 +119,7 @@ Future<bool>  anularVenta(Venta ventaAAnular) async {
       final responseGetProudct = await http.get(
         urlGetProduct,
         headers: {
-          'Authorization': 'Bearer $token',
+          'Authorization': 'Bearer ${await obtenerToken("Token")}',
         },
       );
       if(responseGetProudct.statusCode!=200){
@@ -136,7 +136,7 @@ Future<bool>  anularVenta(Venta ventaAAnular) async {
       final responseCantidadNew = await http.put(
         urlCantidadNew,
         headers: {
-          'Authorization': 'Bearer $token',
+          'Authorization': 'Bearer ${await obtenerToken("Token")}',
           'Content-Type': 'application/json'
         },
         body: productoJsonNew
@@ -153,7 +153,7 @@ Future<bool>  anularVenta(Venta ventaAAnular) async {
     final responseAnularVenta = await http.put(
       urlAnularVenta,
       headers: {
-        'Authorization': 'Bearer $token',
+        'Authorization': 'Bearer ${await obtenerToken("Token")}',
         'Content-Type': 'application/json'
       },
       body: ventaJson,
@@ -174,7 +174,7 @@ Future<List<Cliente>> getClientes(String nombre) async {
     final response = await http.get(
       url,
       headers: {
-        'Authorization': 'Bearer $token',
+        'Authorization': 'Bearer ${await obtenerToken("Token")}',
       },
     );
     if(response.statusCode==200){
@@ -216,7 +216,7 @@ Future<List<Producto>> getProductosVenta(String nombre) async {
     final response = await http.get(
       url,
       headers: {
-        'Authorization': 'Bearer $token',
+        'Authorization': 'Bearer ${await obtenerToken("Token")}',
       },
     );
     if(response.statusCode==200){
@@ -266,7 +266,7 @@ Future<bool> realizarVenta(List<DetallesVenta> detalles,Cliente? cliente) async 
     final response = await http.post(
       url,
       headers: {
-        'Authorization': 'Bearer $token',
+        'Authorization': 'Bearer ${await obtenerToken("Token")}',
         'Content-Type': 'application/json'
       },
       body: ventaString
@@ -277,7 +277,7 @@ Future<bool> realizarVenta(List<DetallesVenta> detalles,Cliente? cliente) async 
       final response = await http.get(
         urlUltimaVenta,
         headers: {
-          'Authorization': 'Bearer $token',
+          'Authorization': 'Bearer ${await obtenerToken("Token")}',
         },
       );
 
@@ -299,7 +299,7 @@ Future<bool> realizarVenta(List<DetallesVenta> detalles,Cliente? cliente) async 
         final responseDetalle = await http.post(
           urlDetalle,
           headers: {
-            'Authorization': 'Bearer $token',
+            'Authorization': 'Bearer ${await obtenerToken("Token")}',
             'Content-Type': 'application/json'
           },
           body: detalleString
@@ -311,7 +311,7 @@ Future<bool> realizarVenta(List<DetallesVenta> detalles,Cliente? cliente) async 
           final responseUpdateProducto = await http.put(
             urlUpdateProduct,
             headers: {
-              'Authorization': 'Bearer $token',
+              'Authorization': 'Bearer ${await obtenerToken("Token")}',
               'Content-Type': 'application/json'
             },
             body: productoJson
@@ -340,7 +340,7 @@ Future<List<Venta>> getVentasQuery(String query) async {
     final response = await http.get(
       url,
       headers: {
-        'Authorization': 'Bearer $token',
+        'Authorization': 'Bearer ${await obtenerToken("Token")}',
       },
     );
 
@@ -383,7 +383,7 @@ Future<Cliente> getClientePordefecto() async {
     final response = await http.get(
       url,
       headers: {
-        'Authorization': 'Bearer $token',
+        'Authorization': 'Bearer ${await obtenerToken("Token")}',
       },
     );
     if(response.statusCode==200){

@@ -317,3 +317,38 @@ Future<bool> alertaCerrarSesion(BuildContext context) async{
   return completer.future;
 }
 
+Future<bool> alertasLogin(BuildContext context,bool? tipo,String descripcion) async{
+  Completer<bool> completer = Completer<bool>();
+
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Column(
+          children: [
+            tipo!=null?Text(tipo?"Exito":"Error"):const Text(""),
+            const Padding(padding: EdgeInsets.all(10)),
+            Text(descripcion,style:const TextStyle(fontSize: 20)),
+          ],
+        ),
+        actions: [
+          TextButton(
+            style:const ButtonStyle(
+              shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5)))),
+              backgroundColor: MaterialStatePropertyAll(Colors.black)
+            ),
+            child: const Text('Aceptar',style: TextStyle(color: Colors.white),),
+            onPressed: () async{
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      );
+    },
+  ).then((value) {
+      completer.complete(true);
+  });
+  return completer.future;
+}
