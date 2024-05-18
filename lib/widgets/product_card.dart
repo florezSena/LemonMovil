@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:lemonapp/models/producto.dart';
 import 'package:lemonapp/pages/layout/layout_componentes.dart';
@@ -36,7 +38,13 @@ class _ProductCardState extends State<ProductCard> {
 
           if(isMetodo==false){
             context.read<MetodosProvider>().metodoExecuting();
-            _alertaCambiarEstado(context, producto);
+            _alertaCambiarEstado(context, producto).then((value) {
+              if(value==0){
+                setState(() {
+                  producto.estado=producto.estado==1?0:1;
+                });
+              }
+            });
           }
 
         }
@@ -124,8 +132,9 @@ class _ProductCardState extends State<ProductCard> {
 
 
 
-  void _alertaCambiarEstado(BuildContext context,Producto productoACambiar) {
+  Future<int> _alertaCambiarEstado(BuildContext context,Producto productoACambiar) async{
     int x =0;
+    Completer<int> completer = Completer<int>();
     
     showModalBottomSheet(
       backgroundColor: Colors.transparent,
@@ -171,17 +180,20 @@ class _ProductCardState extends State<ProductCard> {
           context.read<ProductosProvider>().updateProductList(productoACambiar);
           
           if(response){
+            completer.complete(1);
             return alertFinal(context, response, "Estado actualizado");
           }else{
+             completer.complete(0);
+
             return alertFinal(context, response, "Estado no actualizado");
           }
-          
         });
       }else{
           context.read<MetodosProvider>().metodoExecuted();
       }
     }
   );
+  return completer.future;
 }
 
 
@@ -237,6 +249,7 @@ void _alertaEliminarProducto(BuildContext context,Producto productoAEliminar) {
       });
     }
   });
+  
 }
 
 
