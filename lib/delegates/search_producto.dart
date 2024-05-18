@@ -3,6 +3,7 @@ import 'package:lemonapp/models/producto.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:lemonapp/providers/productos_provider.dart';
+import 'package:lemonapp/services/config.dart';
 import 'package:lemonapp/widgets/product_card.dart';
 import 'package:provider/provider.dart';
 
@@ -14,7 +15,7 @@ class SearchProducto extends SearchDelegate<Producto?>{
     final response = await http.get(
       url,
       headers: {
-        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJiYXNlV2ViQXBpU3ViamVjdCIsImp0aSI6IjQ3NmE3MTgzLWZlMTAtNGE0MS1hYmNmLWQ2MDVjMDFmOTBmYSIsImlhdCI6IjEyLzA0LzIwMjQgMTo1NzoyMCBhLsKgbS4iLCJpZFVzZXIiOiIxIiwiZXhwIjoyMTIzMTE0MjQwLCJpc3MiOiJodHRwczovL2xvY2FsaG9zdDo3MjAwLyIsImF1ZCI6Imh0dHBzOi8vbG9jYWxob3N0OjcyMDAvIn0.Ao9qSTlj833ByfWpZvkV2FfOrBK5Egms2oRrXAoVEYM',
+        'Authorization': 'Bearer ${await obtenerToken("Token")}',
       },
     );
     List<Producto> productos=[];

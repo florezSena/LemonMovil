@@ -4,6 +4,7 @@ import 'package:lemonapp/models/producto.dart';
 import 'package:lemonapp/pages/layout/layout_componentes.dart';
 import 'package:lemonapp/providers/productos_provider.dart';
 import 'package:lemonapp/services/service_product.dart';
+import 'package:lemonapp/widgets/alertas_widget.dart';
 import 'package:provider/provider.dart';
 
 class EditProduct extends StatefulWidget {
@@ -131,16 +132,6 @@ class _EditProduct extends State<EditProduct> {
                       return null;
                     }
                   ),
-                  const Padding(padding: EdgeInsets.only(bottom: 40)),
-                  _isPosting==true?const Center(
-                    child: Column(
-                      children: [
-                        Text("Cargando..."),
-                        Padding(padding: EdgeInsets.only(bottom: 15)),
-                        CircularProgressIndicator(),
-                      ],
-                    ),
-                  ):const Text(""),
                 ],
               ),
             )
@@ -161,9 +152,10 @@ class _EditProduct extends State<EditProduct> {
                   productSelect.nombre=nameController.text;
                   productSelect.descripcion=descripcionController?.text;
 
-
+                  alertaCargando(context);
                   await duplicateNameUpdate(productSelect).then((nameDuplicated) async{
                     if (nameDuplicated==true){
+                      Navigator.pop(context);
                       setState(() {
                         _isPosting=false;
                       });
@@ -186,7 +178,9 @@ class _EditProduct extends State<EditProduct> {
                       }
                     }else{
                       productSelect.descripcion=productSelect.descripcion==""?null:productSelect.descripcion;
+
                       await putProduct(productSelect).then((respuesta){
+                        Navigator.pop(context);
                         if(respuesta){
                           context.read<ProductosProvider>().updateProductList(productSelect);
                           ScaffoldMessenger.of(context)

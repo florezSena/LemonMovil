@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:lemonapp/pages/layout/layout_componentes.dart';
 import 'package:lemonapp/services/service_product.dart';
+import 'package:lemonapp/widgets/alertas_widget.dart';
 
 class AddProduct extends StatefulWidget {
   const AddProduct({super.key});
@@ -134,9 +135,11 @@ class _AddProduct extends State<AddProduct> {
                   setState(() {
                     _isPosting=true;
                   });
+                  alertaCargando(context);
 
                   await duplicateName(nameController.text).then((nameDuplicated) async{
                     if (nameDuplicated==true){
+                      Navigator.pop(context);
                       setState(() {
                         _isPosting=false;
                       });
@@ -159,6 +162,7 @@ class _AddProduct extends State<AddProduct> {
                       }
                     }else{
                       await postProductos(nameController.text,descripcionController?.text).then((respuesta){
+                        Navigator.pop(context);
                         if(respuesta){
                           ScaffoldMessenger.of(context)
                           .showSnackBar(
