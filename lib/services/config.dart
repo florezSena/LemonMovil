@@ -32,9 +32,9 @@ Future<String>  login(String usuarioString,String passwordString) async {
   if(response.statusCode==200){
     String body = utf8.decode(response.bodyBytes);
     final jsonData=jsonDecode(body);
-    List<int> permisos = List<int>.from(jsonData["permisos"]);
     
     if(jsonData['success']){
+      List<int> permisos = List<int>.from(jsonData["permisos"]);
       if(permisos.contains(5) && permisos.contains(6)){
         String tokenString=jsonData["result"];
         guardarToken("Token", tokenString);
@@ -42,7 +42,6 @@ Future<String>  login(String usuarioString,String passwordString) async {
       }else{
         return "No contienes los permisos para acceder al aplicativo";
       }
-      
     }
     return "${jsonData["message"]}";
   }else{
