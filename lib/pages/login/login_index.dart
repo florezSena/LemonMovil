@@ -150,7 +150,15 @@ class _LoginIndex extends State<LoginIndex> {
                                     SlidePageRoute(page:const LayoutIndex()),
                                   );
                                 }else{
-                                  alertasLogin(context, false, value);
+                                  String messageError;
+                                  if(value=="Su suario ha sido inhabilitado"){
+                                    messageError="Su usuario se encuentra inhabilitado";
+                                  }else if(value =="Su rol ha sido inhabilitado"){
+                                    messageError ="Su rol se encuentra inhabilitado";
+                                  }else{
+                                    messageError=value;
+                                  }
+                                  alertasLogin(context, false, messageError);
                                 }
                               });
                             }
