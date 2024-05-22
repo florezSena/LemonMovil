@@ -75,14 +75,54 @@ class _VisualizarVentaState extends State<VisualizarVenta> {
                       child: CircularProgressIndicator(),
                     );
                     } else if (snapshot.hasError) {
-                      return SingleChildScrollView(
-                        child: Container(
+                      if (snapshot.error is Exception) {
+                        // Acceder al mensaje de la Exception
+                        String errorMessage = (snapshot.error as Exception).toString();
+                        if(errorMessage=="Exception: Exception: Sin permisos"){
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            errorSesion(context, "Su usuario se ha actualizado vuelva a iniciar sesion");
+                          });
+                          return const Text("Error de sesion");
+                        }else{
+                          return Container(
+                            alignment: Alignment.center,
+                            height: MediaQuery.of(context).size.height,
+                            width: MediaQuery.of(context).size.width,
+                            child: const Card(
+                              child: Padding(
+                                padding:EdgeInsets.all(8.0),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    Icon(Icons.error, color: Colors.black, size: 50),
+                                    Padding(padding: EdgeInsets.only(top: 15)),
+                                    Text('No hay conexión a Internet', style: TextStyle(fontSize: 16)),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+                      }else{
+                        return Container(
                           alignment: Alignment.center,
                           height: MediaQuery.of(context).size.height,
                           width: MediaQuery.of(context).size.width,
-                          child:Text("${snapshot.error}"),
-                        ),
-                      );
+                          child: const Card(
+                            child: Padding(
+                              padding:EdgeInsets.all(8.0),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  Icon(Icons.error, color: Colors.black, size: 50),
+                                  Padding(padding: EdgeInsets.only(top: 15)),
+                                  Text('Error sin controlar', style: TextStyle(fontSize: 16)),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      }
                     }else{
                       List<DetallesVenta> detallesVenta = snapshot.data!;
                       return ListView.builder(
