@@ -98,8 +98,8 @@ Future<List<DetallesVenta>> getDetalleVentas(int idVenta) async {
 Future<bool>  anularVenta(Venta ventaAAnular) async {
   try{
     //Traemos los detalles de la venta para saber cual es el producto que debemos restar
-    final Uri urlDetallesVenta = Uri.parse("$httpUrl/DetalleVentums/GetDetallesVenta?id=${ventaAAnular.idVenta}");
-    final responseDetalleVenta = await http.get(
+    final Uri urlDetallesVenta = Uri.parse("$httpUrl/Ventums/AnularVenta?ventaId=${ventaAAnular.idVenta}");
+    final responseDetalleVenta = await http.put(
       urlDetallesVenta,
       headers: {
         'Authorization': 'Bearer ${await obtenerToken("Token")}',
@@ -107,58 +107,6 @@ Future<bool>  anularVenta(Venta ventaAAnular) async {
     );
     //Si la respuesta no es 200 hubo un error
     if(responseDetalleVenta.statusCode!=200){
-      return false;
-    }
-    String body = utf8.decode(responseDetalleVenta.bodyBytes);
-
-    final detallesVentaJson=jsonDecode(body);
-    //A cada producto del detalle le vamos a restar la cantidad vendida
-    for (var detalleVenta in detallesVentaJson) {
-      //Traemos el proudcto del detalle
-      final Uri urlGetProduct = Uri.parse("$httpUrl/Productos/GetProductById?id=${detalleVenta["idProducto"]}");
-      final responseGetProudct = await http.get(
-        urlGetProduct,
-        headers: {
-          'Authorization': 'Bearer ${await obtenerToken("Token")}',
-        },
-      );
-      if(responseGetProudct.statusCode!=200){
-        return false;
-      }
-      String body = utf8.decode(responseGetProudct.bodyBytes);
-      final productoJson=jsonDecode(body);
-      
-      //Le restamos la cantidad del detalle(hacer un if productoJson["cantidad"]==0 si es necesario)
-      productoJson["cantidad"]=productoJson["cantidad"]-detalleVenta["cantidad"];
-      String productoJsonNew = jsonEncode(productoJson);
-      //Y mandamos a actualizar el producto
-      final Uri urlCantidadNew = Uri.parse("$httpUrl/Productos/UpdateProduct");
-      final responseCantidadNew = await http.put(
-        urlCantidadNew,
-        headers: {
-          'Authorization': 'Bearer ${await obtenerToken("Token")}',
-          'Content-Type': 'application/json'
-        },
-        body: productoJsonNew
-      );
-      if(responseCantidadNew.statusCode!=200){
-        return false;
-      }
-    }
-    
-    ventaAAnular.estado=0;
-    // Convertir la venta a JSON
-    String ventaJson = jsonEncode(ventaAAnular.ventaToJson());
-    final Uri urlAnularVenta = Uri.parse("$httpUrl/Ventums/UpdateVenta");
-    final responseAnularVenta = await http.put(
-      urlAnularVenta,
-      headers: {
-        'Authorization': 'Bearer ${await obtenerToken("Token")}',
-        'Content-Type': 'application/json'
-      },
-      body: ventaJson,
-    );
-    if(responseAnularVenta.statusCode!=200){
       return false;
     }
     return true;
@@ -254,11 +202,12 @@ Future<List<Producto>> getProductosVenta(String nombre) async {
 Future<bool> realizarVenta(List<DetallesVenta> detalles,Cliente? cliente) async {
   double total=0;
   int ultimoIdVenta=0;
+  //este for es para calcular el total ya que aun no lo teniamos asignado
   for(DetallesVenta detalle in detalles){
     total+=detalle.subtotal;
   }
   total = double.parse(total.toStringAsFixed(2));
-
+  //Ahora crearemos la venta ya que los detallesVenta necesitan un idVenta para ser registrados
   final Uri url = Uri.parse("$httpUrl/Ventums/InsertVenta");
   try{
     Venta newVenta =Venta(0,cliente!.idCliente,DateTime.now(),total,1,cliente);
@@ -272,26 +221,16 @@ Future<bool> realizarVenta(List<DetallesVenta> detalles,Cliente? cliente) async 
       body: ventaString
     );
 
+    
+    //Si la creacion fue exitosa pasaremos a recuperar el id de la venta para poder asignarselo a los detalles
     if(response.statusCode==200){
-      final Uri urlUltimaVenta = Uri.parse("$httpUrl/Ventums/GetVentas");
-      final response = await http.get(
-        urlUltimaVenta,
-        headers: {
-          'Authorization': 'Bearer ${await obtenerToken("Token")}',
-        },
-      );
+      String body = utf8.decode(response.bodyBytes);
 
-      if(response.statusCode==200){
-        String body = utf8.decode(response.bodyBytes);
-        final jsonData=jsonDecode(body);
-        if (jsonData is List && jsonData.isNotEmpty) {
-          jsonData.sort((a, b) => b['idVenta'].compareTo(a['idVenta']));
-          ultimoIdVenta = jsonData.first['idVenta'];
-        }
-      }else{
-        return false;
-      }
+      final jsonData=jsonDecode(body);
+
+      ultimoIdVenta=int.parse(jsonData["id"].toString());
       
+      //Hacmemos un for a los detalles en el cual crearemos cada detalle
       final Uri urlDetalle = Uri.parse("$httpUrl/DetalleVentums/InsertDetalleVenta");
       for(DetallesVenta detalle in detalles){
         detalle.idVenta=ultimoIdVenta;
@@ -304,6 +243,7 @@ Future<bool> realizarVenta(List<DetallesVenta> detalles,Cliente? cliente) async 
           },
           body: detalleString
         );
+        //Si su creacion fue exitosa actualizaremos la cantidad del producto que se vendio(Para la proxima ya se sabe que esto es en la api ajjaja)
         if(responseDetalle.statusCode==200){
           detalle.idProductoNavigation.cantidad-=detalle.cantidad;
           String productoJson = jsonEncode(detalle.idProductoNavigation.productoToJson());
