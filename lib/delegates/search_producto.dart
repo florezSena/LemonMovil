@@ -11,7 +11,7 @@ class SearchProducto extends SearchDelegate<Producto?>{
   int _deleteId=-1;
   Future<List<Producto>>  _getProductos(String nombreSearch) async {
     
-    final Uri url = Uri.parse("http://florezsena-001-site1.ltempurl.com/api/Productos/GetProductByName?nombre=$nombreSearch");
+    final Uri url = Uri.parse("$httpUrl/Productos/GetProductByName?nombre=$nombreSearch");
     final response = await http.get(
       url,
       headers: {

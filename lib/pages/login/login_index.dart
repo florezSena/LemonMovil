@@ -170,7 +170,7 @@ class _LoginIndex extends State<LoginIndex> {
                           children: [
                             GestureDetector(
                               onTap: (){
-                                launchUrlString("https://www.google.com");
+                                launchUrlString("http://weblemonsena-001-site1.jtempurl.com/");
                               },
                               child: Container(
                                 padding: const EdgeInsets.only(top: 15),
