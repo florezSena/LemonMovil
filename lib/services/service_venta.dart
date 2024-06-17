@@ -246,6 +246,8 @@ Future<bool> realizarVenta(List<DetallesVenta> detalles,Cliente? cliente) async 
         //Si su creacion fue exitosa actualizaremos la cantidad del producto que se vendio(Para la proxima ya se sabe que esto es en la api ajjaja)
         if(responseDetalle.statusCode==200){
           detalle.idProductoNavigation.cantidad-=detalle.cantidad;
+          detalle.idProductoNavigation.descripcion=detalle.idProductoNavigation.descripcion=="null"?"":detalle.idProductoNavigation.descripcion;
+
           String productoJson = jsonEncode(detalle.idProductoNavigation.productoToJson());
           final Uri urlUpdateProduct = Uri.parse("$httpUrl/Productos/UpdateProduct");
           final responseUpdateProducto = await http.put(
